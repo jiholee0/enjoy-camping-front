@@ -21,8 +21,5 @@ import Footer from './components/layout/Footer.vue'
   overflow: auto; /* 최소 크기보다 작아지면 스크롤 허용 */
 }
 
-.main-content {
-  padding-top: 60px; /* 800px ~ 1020px 구간에도 패딩 명시 */
-}
 
 </style>

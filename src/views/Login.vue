@@ -12,18 +12,25 @@
                     <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="login-button">로그인</button>
+                    <ButtonDark label="로그인" @click="handleLogin" />
                 </div>
             </form>
             <div class="additional-actions">
-                <a href="#" @click="forgotPassword">비밀번호 찾기</a>
+                <ButtonLight label="비밀번호 찾기" @click="forgotPassword" />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import ButtonDark from '../components/component/ButtonDark.vue';
+import ButtonLight from '../components/component/ButtonLight.vue';
+
 export default {
+    components:{
+        ButtonDark,
+        ButtonLight
+    },
     props: {
         showModal: {
             type: Boolean,
@@ -98,30 +105,7 @@ export default {
     text-align: center;
 }
 
-.login-button {
-    background-color: #0077b6;
-    color: white;
-    padding: 0.75em 1.5em;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.login-button:hover {
-    background-color: #005f8d;
-}
-
 .additional-actions {
     text-align: center;
-    margin-top: 1em;
-}
-
-.additional-actions a {
-    color: #0077b6;
-    text-decoration: none;
-}
-
-.additional-actions a:hover {
-    text-decoration: underline;
 }
 </style>

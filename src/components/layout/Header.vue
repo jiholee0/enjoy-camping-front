@@ -1,7 +1,7 @@
 <template>
     <header class="header">
         <div class="logo">
-            <img src="../../assets/image/Logo.png" alt="logo" />
+            <img src="/images/Logo.png" alt="logo" />
         </div>
         <nav>
             <ul>
@@ -12,10 +12,26 @@
             </ul>
         </nav>
         <div class="auth-buttons">
-            <button v-if="!isLoggedIn" class="login-button" @click="login">로그인</button>
-            <button v-if="!isLoggedIn" class="signup-button" @click="signup">회원가입</button>
-            <button v-else class="logout-button" @click="logout">로그아웃</button>
-            <button v-else class="mypage-button" @click="goToMyPage">마이페이지</button>
+            <ButtonLight
+                v-if="!isLoggedIn"
+                label="로그인"
+                @click="login"
+            />
+            <ButtonDark
+                v-if="!isLoggedIn"
+                label="회원가입"
+                @click="signup"
+            />
+            <ButtonLight
+                v-else
+                label="로그아웃"
+                @click="logout"
+            />
+            <ButtonDark
+                v-else
+                label="마이페이지"
+                @click="goToMyPage"
+            />
         </div>
     </header>
 
@@ -26,12 +42,15 @@
 <script>
 import LoginModal from '../../views/Login.vue';
 import SignupModal from '../../views/Signup.vue';
-
+import ButtonDark from '../component/ButtonDark.vue';
+import ButtonLight from '../component/ButtonLight.vue';
 
 export default {
     components: {
         LoginModal,
-        SignupModal
+        SignupModal,
+        ButtonDark,
+        ButtonLight
     },
     data() {
         return {
@@ -98,38 +117,5 @@ nav ul li a {
 
 .auth-buttons {
     display: flex;
-}
-
-.auth-buttons button {
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    margin-left: 0.5rem;
-    white-space: nowrap;
-}
-
-.signup-button,
-.mypage-button {
-    background-color: #0077b6;
-    margin-right: 2rem;
-}
-
-.login-button,
-.logout-button {
-    color: #0077b6 !important;
-    background-color: white;
-}
-
-.signup-button:hover,
-.mypage-button:hover {
-    color: white !important;
-    background-color: #81C3D7;
-}
-
-.login-button:hover,
-.logout-button:hover {
-    color: #81C3D7 !important;
-    background-color: white;
 }
 </style>

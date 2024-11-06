@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="footer-logo">
-            <img src="../../assets/image/Logo Light.png" alt="logo" />
+            <img src="/images/Logo Light.png" alt="logo" />
         </div>
     </footer>
 </template>

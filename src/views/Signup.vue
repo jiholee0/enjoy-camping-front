@@ -16,7 +16,7 @@
                     <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="signup-button">회원가입</button>
+                    <ButtonDark label="회원가입" @click="handleSignup" />
                 </div>
             </form>
         </div>
@@ -24,7 +24,11 @@
 </template>
 
 <script>
+import ButtonDark from '../components/component/ButtonDark.vue';
 export default {
+    components: {
+        ButtonDark
+    },
     props: {
         showModal: {
             type: Boolean,
@@ -94,32 +98,5 @@ export default {
 
 .form-actions {
     text-align: center;
-}
-
-.signup-button {
-    background-color: #0077b6;
-    color: white;
-    padding: 0.75em 1.5em;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.login-button:hover {
-    background-color: #005f8d;
-}
-
-.additional-actions {
-    text-align: center;
-    margin-top: 1em;
-}
-
-.additional-actions a {
-    color: #0077b6;
-    text-decoration: none;
-}
-
-.additional-actions a:hover {
-    text-decoration: underline;
 }
 </style>
