@@ -18,21 +18,34 @@
             <button v-else class="mypage-button" @click="goToMyPage">마이페이지</button>
         </div>
     </header>
+
+    <LoginModal :showModal="isLoginModalOpen" @close="isLoginModalOpen = false" />
+    <SignupModal :showModal="isSignupModalOpen" @close="isSignupModalOpen = false" />
 </template>
 
 <script>
+import LoginModal from '../../views/Login.vue';
+import SignupModal from '../../views/Signup.vue';
+
+
 export default {
+    components: {
+        LoginModal,
+        SignupModal
+    },
     data() {
         return {
             isLoggedIn: false,
+            isLoginModalOpen: false,
+            isSignupModalOpen: false
         };
     },
     methods: {
         login() {
-            // 로그인 로직 추가
+            this.isLoginModalOpen = true;
         },
         signup() {
-            // 회원가입 로직 추가
+            this.isSignupModalOpen = true;
         },
         logout() {
             this.isLoggedIn = false;
