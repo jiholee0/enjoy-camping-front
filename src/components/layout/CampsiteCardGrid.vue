@@ -8,7 +8,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import Card from '../component/Card.vue';
+import Card from '../component/CardLight.vue';
 import NoImage from '/images/NoImage.png'
 
 const values = ref([
@@ -59,6 +59,7 @@ const values = ref([
 
 <style scoped>
 .grid-container {
+    max-width: 1000px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 3rem;

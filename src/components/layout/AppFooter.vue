@@ -28,7 +28,7 @@ export default {};
 
 <style scoped>
 .footer {
-    position: fixed;
+    position: relative;
     bottom: 0;
     left: 0;
     width: 100%;
@@ -87,7 +87,7 @@ export default {};
 }
 
 .footer-logo img {
-    
+
     height: 30px;
     width: auto;
 }

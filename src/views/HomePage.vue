@@ -21,7 +21,7 @@ import ImageSlider from '@/components/layout/ImageSlider.vue';
 
 
 export default defineComponent({
-    name: 'Home',
+    name: 'HomePage',
     components: {
         CampsiteCardGrid,
         ButtonDark,

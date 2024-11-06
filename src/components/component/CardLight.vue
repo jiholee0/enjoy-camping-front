@@ -1,11 +1,11 @@
 <!-- Card.vue -->
 <template>
     <div class="card">
-        <img :src="image" alt="이미지" class="card-image" />
+        <img :src="props.image" alt="이미지" class="card-image" />
         <div class="card-content">
-            <h3>{{ name }}</h3>
-            <p>{{ address }}</p>
-            <p>{{ description }}</p>
+            <h3>{{ props.name }}</h3>
+            <p>{{ props.address }}</p>
+            <p>{{ props.description }}</p>
         </div>
     </div>
 </template>
