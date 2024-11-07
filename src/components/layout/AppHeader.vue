@@ -6,9 +6,9 @@
       <nav>
           <ul>
               <li><a href="/">HOME</a></li>
-              <li><a href="/campgrounds">캠핑장 둘러보기</a></li>
-              <li><a href="/tourist">관광지 둘러보기</a></li>
-              <li><a href="/review">리뷰 쓰기</a></li>
+              <li><a href="/viewCampsites">캠핑장 둘러보기</a></li>
+              <li><a href="/viewAttractions">관광지 둘러보기</a></li>
+              <li><a href="/writeReview">리뷰 쓰기</a></li>
           </ul>
       </nav>
       <div class="auth-buttons">

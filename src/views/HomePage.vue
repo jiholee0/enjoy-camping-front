@@ -15,10 +15,10 @@
 
 <script>
 import { defineComponent } from 'vue'
+import { useRouter } from 'vue-router' // 이미 내장된 Vue Router 사용
 import CampsiteCardGrid from '@/components/layout/CampsiteCardGrid.vue';
 import ButtonDark from '@/components/component/ButtonDark.vue';
 import ImageSlider from '@/components/layout/ImageSlider.vue';
-
 
 export default defineComponent({
     name: 'HomePage',
@@ -27,10 +27,14 @@ export default defineComponent({
         ButtonDark,
         ImageSlider
     },
-    method: {
-        viewAll(){
+    setup() {
+        const router = useRouter(); // router 인스턴스 가져오기
 
-        }
+        const viewAll = () => {
+            router.push('/viewCampsites');
+        };
+
+        return { viewAll };
     }
 })
 </script>
