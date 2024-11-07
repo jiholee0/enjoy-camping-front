@@ -1,51 +1,47 @@
 <template>
-  <div class="tag-filter">
-    <span
+  <div class="single-tag-filter">
+    <button
       v-for="tag in tags"
       :key="tag"
-      class="tag"
-      :class="{ 'tag-selected': selectedTags.includes(tag) }"
-      @click="toggleTag(tag)"
+      :class="['tag-button', { active: tag === selectedTag } ]"
+      @click="selectTag(tag)"
     >
-      <span v-if="selectedTags.includes(tag)" class="check-icon">✓</span>
+      <span v-if="tag === selectedTag" class="check-icon">✓</span>
       {{ tag }}
-    </span>
+    </button>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TagFilter',
+  name: 'SingleTagFilter',
   props: {
     tags: {
       type: Array,
-      default: () => [],
+      required: true,
     },
   },
   data() {
     return {
-      selectedTags: [],
+      selectedTag: null,
     };
   },
   methods: {
-    toggleTag(tag) {
-      if (this.selectedTags.includes(tag)) {
-        this.selectedTags = this.selectedTags.filter(t => t !== tag);
-      } else {
-        this.selectedTags.push(tag);
-      }
+    selectTag(tag) {
+      // 단일 선택을 위해 클릭한 태그를 selectedTag로 설정
+      this.selectedTag = this.selectedTag === tag ? null : tag;
     },
   },
 };
 </script>
 
 <style scoped>
-.tag-filter {
+.single-tag-filter {
   display: flex;
   gap: 4px;
 }
 
-.tag {
+.tag-button {
   padding: 4px 8px;
   font-size: 11px;
   height: 32px;
@@ -56,10 +52,11 @@ export default {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
+  border: none;
 }
 
-.tag-selected {
-  background-color: #333;
+.tag-button.active {
+  background-color: #0077b6;
   color: white;
   padding-left: 4px;
 }

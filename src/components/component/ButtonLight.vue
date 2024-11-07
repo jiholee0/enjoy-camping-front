@@ -1,21 +1,16 @@
 <!-- ButtonLight.vue -->
 <template>
-    <button class="button-light" @click="onClick">
-        <slot>{{ label }}</slot>
-    </button>
+  <button class="button-light" @click="$emit('click1')">
+    <slot>{{label}}</slot>
+  </button>
 </template>
 
 <script>
 export default {
-    props: {
+  props: {
         label: {
             type: String,
             required: true,
-        },
-    },
-    methods: {
-        onClick() {
-            this.$emit('click');
         },
     },
 };

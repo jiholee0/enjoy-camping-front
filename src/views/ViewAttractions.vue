@@ -1,6 +1,6 @@
 <template>
-  <div class="viewCampsites">
-    <!-- Search Bar -->
+  <div class="viewAttractions">
+    <!-- Search Bar with Search Button -->
     <div class="search-container">
       <SearchBar label="캠핑장 검색하기" />
       <ButtonDark class="search-button" @click.capture="onSearch">검색</ButtonDark>
@@ -8,16 +8,16 @@
 
     <!-- Filters Container -->
     <div class="filters-container">
+      <MultiTagFilter :tags="tags" />
       <div class="select-group">
         <SelectBox :options="regionOptions" placeholder="시/도 선택" />
         <SelectBox :options="districtOptions" placeholder="구/군 선택" />
       </div>
-      <SingleTagFilter :tags="sortOptions" />
     </div>
 
-    <!-- Campsite Grid -->
-    <div class="campsite-grid">
-      <CampsiteCardGrid />
+    <!-- Tourist Site Grid -->
+    <div class="attraction-grid">
+      <AttractionCardGrid />
     </div>
   </div>
 </template>
@@ -26,21 +26,22 @@
 import { defineComponent } from 'vue';
 import SearchBar from '@/components/component/SearchBar.vue';
 import SelectBox from '@/components/component/SelectBox.vue';
-import SingleTagFilter from '@/components/component/SingleTagFilter.vue';
-import CampsiteCardGrid from '@/components/layout/CampsiteCardGrid.vue';
+import MultiTagFilter from '@/components/component/MultiTagFilter.vue';
+import AttractionCardGrid from '@/components/layout/AttractionCardGrid.vue';
 import ButtonDark from '@/components/component/ButtonDark.vue';
 
 export default defineComponent({
-  name: 'ViewCampsites',
+  name: 'ViewAttractions',
   components: {
     SearchBar,
     SelectBox,
-    SingleTagFilter,
-    CampsiteCardGrid,
+    MultiTagFilter,
+    AttractionCardGrid,
     ButtonDark
   },
   data() {
     return {
+      tags: ['관광지', '문화시설', '축제공연행사', '여행코스', '레포츠', '숙박', '쇼핑', '음식점'],
       regionOptions: [
         { value: 'seoul', label: '서울특별시' },
         { value: 'busan', label: '부산광역시' },
@@ -49,7 +50,7 @@ export default defineComponent({
         { value: 'nowon', label: '노원구' },
         { value: 'gangnam', label: '강남구' },
       ],
-      sortOptions: ['이름순', '리뷰많은순'],
+      showFilters: true, // 필터가 항상 표시되도록 설정
     };
   },
   methods: {
@@ -60,7 +61,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.viewCampsites {
+.viewAttractions {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +79,8 @@ export default defineComponent({
 
 .filters-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 16px;
   align-items: center;
   width: 100%;
   max-width: 800px;
@@ -90,4 +92,12 @@ export default defineComponent({
   gap: 8px;
 }
 
+.attraction-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 1000px;
+  width: 100%;
+}
 </style>
