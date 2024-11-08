@@ -1,22 +1,43 @@
 <!-- Card.vue -->
 <template>
-    <div class="card">
-        <img :src="props.image" alt="이미지" class="card-image" />
+    <div class="card" @click="goToDetail">
+        <img :src="image" alt="이미지" class="card-image" />
         <div class="card-content">
-            <h3>{{ props.name }}</h3>
-            <p>{{ props.address }}</p>
-            <p>{{ props.description }}</p>
+            <h3>{{ name }}</h3>
+            <p>{{ address }}</p>
+            <p>{{ description }}</p>
         </div>
     </div>
 </template>
 
-<script setup>
-const props = defineProps({
-    name: String,
-    address: String,
-    description: String,
-    image: String,
-});
+<script>
+import { useRouter } from 'vue-router';
+
+export default {
+    props: {
+        name: String,
+        address: String,
+        description: String,
+        image: String,
+        id: Number
+    },
+    setup() {
+        const router = useRouter();
+
+        function goToDetail() {
+            router.push({
+                name: 'DetailPage',
+                params: {
+                    id: this.id
+                }
+            });
+        }
+
+        return {
+            goToDetail
+        };
+    }
+};
 </script>
 
 <style scoped>
@@ -30,6 +51,8 @@ const props = defineProps({
 
 .card:hover {
     transform: translateY(-5px);
+    box-shadow: 0px 6px 15px #0076b630 !important;
+    transition: box-shadow 0.3s ease-in-out !important;
 }
 
 .card-image {

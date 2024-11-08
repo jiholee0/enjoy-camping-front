@@ -14,4 +14,12 @@ export default [
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+  {
+    name: 'global-variables',
+    languageOptions: {
+      globals: {
+        kakao: 'readonly', // kakao를 전역으로 선언하여 ESLint가 인식할 수 있도록 함
+      },
+    },
+  },
 ]

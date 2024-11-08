@@ -16,43 +16,50 @@ const values = ref([
         name: '관광지 이름 1',
         address: '주소 1',
         description: '설명 1',
-        image: NoImage
+        image: NoImage,
+        id: 1
     },
     {
         name: '관광지 이름 2',
         address: '주소 2',
         description: '설명 2',
-        image: NoImage
+        image: NoImage,
+        id: 2
     },
     {
         name: '관광지 이름 3',
         address: '주소 3',
         description: '설명 3',
-        image: NoImage
+        image: NoImage,
+        id: 3
     },
     {
         name: '관광지 이름 4',
         address: '주소 4',
         description: '설명 4',
-        image: NoImage
+        image: NoImage,
+        id: 4
     },
     {
         name: '관광지 이름 5',
         address: '주소 5',
         description: '설명 5',
-        image: NoImage
+        image: NoImage,
+        id: 5
     },
     {
         name: '관광지 이름 6',
         address: '주소 6',
         description: '설명 6',
-        image: NoImage
+        image: NoImage,
+        id: 6
     },
     {
         name: '관광지 이름 7',
         address: '주소 7',
         description: '설명 7',
-        image: NoImage
+        image: NoImage,
+        id: 7
     },
 ]);
 </script>

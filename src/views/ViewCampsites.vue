@@ -3,7 +3,7 @@
     <!-- Search Bar -->
     <div class="search-container">
       <SearchBar label="캠핑장 검색하기" />
-      <ButtonDark class="search-button" @click.capture="onSearch">검색</ButtonDark>
+      <ButtonDark class="search-button" @click.capture="onSearch" label="검색"/>
     </div>
 
     <!-- Filters Container -->

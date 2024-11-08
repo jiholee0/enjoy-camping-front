@@ -25,22 +25,22 @@
       <ButtonLight
         v-if="!isLoggedIn"
         label="로그인"
-        @click="login"
+        @click.capture="login"
       />
       <ButtonLight
         v-else
         label="로그아웃"
-        @click="logout"
+        @click.capture="logout"
       />
       <ButtonDark
         v-if="!isLoggedIn"
         label="회원가입"
-        @click="signup"
+        @click.capture="signup"
       />
       <ButtonDark
         v-else
         label="마이페이지"
-        @click="goToMyPage"
+        @click.capture="goToMyPage"
       />
     </div>
   </header>

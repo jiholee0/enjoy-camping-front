@@ -87,7 +87,6 @@ export default {};
 }
 
 .footer-logo img {
-
     height: 30px;
     width: auto;
 }

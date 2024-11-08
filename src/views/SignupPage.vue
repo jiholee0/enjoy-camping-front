@@ -20,7 +20,7 @@
                   <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
               </div>
               <div class="form-actions">
-                  <ButtonDark label="회원가입" @click="handleSignup" />
+                  <ButtonDark label="회원가입" @click.capture="handleSignup" />
               </div>
           </form>
       </div>
