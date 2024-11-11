@@ -1,10 +1,6 @@
 <template>
   <div class="password-change">
     <form @submit.prevent="handlePasswordChange">
-      <div class="intro">
-        ※ 비밀번호는 6자 이상이어야 하며, <br>
-        &nbsp;&nbsp; 특수문자, 영어, 숫자를 포함해야 합니다.
-      </div>
       <div class="form-group">
         <label for="currentPassword">이전 비밀번호 입력</label>
         <div class="input-wrapper">
@@ -88,7 +84,7 @@ const validatePassword = () => {
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-=])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;?><,./-=]{6,}$/;
   passwordError.value = passwordPattern.test(newPassword.value)
     ? ''
-    : '비밀번호가 조건에 맞게 입력되었는지 확인하세요.';
+    : '비밀번호는 6자 이상이어야 하며, 특수문자, 영어, 숫자를 포함해야 합니다.';
   validateConfirmPassword();
 };
 
@@ -140,15 +136,8 @@ label {
   margin-left: 8px;
 }
 
-.intro {
-  color: #333;
-  font-size: 0.8em;
-  margin-left: 8px;
-  margin-bottom: 8px;
-}
-
 input {
-  width: 300px;
+  width: 400px;
   padding: 10px;
   font-size: 0.8rem;
   border: 1px solid #ccc;
