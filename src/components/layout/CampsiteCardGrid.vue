@@ -67,10 +67,10 @@ const values = ref([
 <style scoped>
 .grid-container {
   width: 100%;
-    max-width: 1000px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    padding: 50px 100px;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  padding: 50px 100px;
 }
 </style>

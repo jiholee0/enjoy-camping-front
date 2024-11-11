@@ -61,7 +61,8 @@ export default defineComponent({
 .tab-menu {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  width: 100% ;
 }
 
 .tabs {
@@ -73,7 +74,7 @@ export default defineComponent({
 button {
   background: none;
   border: none;
-  font-size: 16px;
+  font-size: 0.9rem;
   cursor: pointer;
   padding: 8px;
   color: #333;
@@ -81,13 +82,12 @@ button {
 }
 
 button.active {
-  color: #000;
+  color: #0077b6;
   font-weight: bold;
-  border-bottom: 2px solid #000; /* Bottom border for active 탭 */
+  border-bottom: 2px solid #0077b6; /* Bottom border for active 탭 */
 }
 
 .tab-content {
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -15,10 +15,9 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
 import ReviewCard from '@/components/component/ReviewCard.vue';
 
-export default defineComponent({
+export default {
   components: {
     ReviewCard,
   },
@@ -29,7 +28,7 @@ export default defineComponent({
       required: true,
     },
   },
-});
+};
 </script>
 
 <style scoped>

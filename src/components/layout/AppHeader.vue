@@ -64,7 +64,8 @@ export default {
   },
   data() {
     return {
-      isLoggedIn: false,
+      // isLoggedIn: false,
+      isLoggedIn: true,
       isLoginModalOpen: false,
       isSignupModalOpen: false
     };
@@ -80,7 +81,7 @@ export default {
       this.isLoggedIn = false;
     },
     goToMyPage() {
-      // 마이페이지 이동 로직 추가
+      this.$router.push('/myPage'); // 마이페이지로 이동
     },
     isActive(path) {
       return this.$route.path === path;
