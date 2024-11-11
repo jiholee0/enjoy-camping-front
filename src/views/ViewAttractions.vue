@@ -2,62 +2,66 @@
   <div class="viewAttractions">
     <!-- Search Bar with Search Button -->
     <div class="search-container">
-      <SearchBar label="캠핑장 검색하기" />
-      <ButtonDark class="search-button" @click.capture="onSearch" label="검색"/>
+      <SearchBar label="캠핑장 검색하기" v-model="searchQuery" />
+      <ButtonDark class="search-button" @click="onSearch" label="검색"/>
     </div>
 
     <!-- Filters Container -->
     <div class="filters-container">
-      <MultiTagFilter :tags="tags" />
+      <MultiTagFilter :tags="tags" v-model="selectedTags" />
       <div class="select-group">
-        <SelectBox :options="regionOptions" placeholder="시/도 선택" />
-        <SelectBox :options="districtOptions" placeholder="구/군 선택" />
+        <SelectBox :options="regionOptions" placeholder="시/도 선택" v-model="selectedRegion" />
+        <SelectBox :options="districtOptions" placeholder="구/군 선택" v-model="selectedDistrict" />
       </div>
     </div>
 
     <!-- Tourist Site Grid -->
     <div class="attraction-grid">
-      <AttractionCardGrid />
+      <AttractionCardGrid :filters="activeFilters" />
     </div>
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import SearchBar from '@/components/component/SearchBar.vue';
-import SelectBox from '@/components/component/SelectBox.vue';
-import MultiTagFilter from '@/components/component/MultiTagFilter.vue';
-import AttractionCardGrid from '@/components/layout/AttractionCardGrid.vue';
-import ButtonDark from '@/components/component/ButtonDark.vue';
+<script setup>
+import { ref, computed } from 'vue';
+import SearchBar from '@/components/SearchBar.vue';
+import SelectBox from '@/components/SelectBox.vue';
+import MultiTagFilter from '@/components/MultiTagFilter.vue';
+import AttractionCardGrid from '@/layout/AttractionCardGrid.vue';
+import ButtonDark from '@/components/ButtonDark.vue';
 
-export default defineComponent({
-  name: 'ViewAttractions',
-  components: {
-    SearchBar,
-    SelectBox,
-    MultiTagFilter,
-    AttractionCardGrid,
-    ButtonDark
-  },
-  data() {
-    return {
-      tags: ['관광지', '문화시설', '축제공연행사', '여행코스', '레포츠', '숙박', '쇼핑', '음식점'],
-      regionOptions: [
-        { value: 'seoul', label: '서울특별시' },
-        { value: 'busan', label: '부산광역시' },
-      ],
-      districtOptions: [
-        { value: 'nowon', label: '노원구' },
-        { value: 'gangnam', label: '강남구' },
-      ],
-      showFilters: true, // 필터가 항상 표시되도록 설정
-    };
-  },
-  methods: {
-    onSearch() {
-    },
-  },
-});
+// 검색어와 필터 상태 관리
+const searchQuery = ref('');
+const selectedTags = ref([]);
+const selectedRegion = ref('');
+const selectedDistrict = ref('');
+
+const tags = ref(['관광지', '문화시설', '축제공연행사', '여행코스', '레포츠', '숙박', '쇼핑', '음식점']);
+const regionOptions = ref([
+  { value: 'seoul', label: '서울특별시' },
+  { value: 'busan', label: '부산광역시' },
+]);
+const districtOptions = ref([
+  { value: 'nowon', label: '노원구' },
+  { value: 'gangnam', label: '강남구' },
+]);
+
+// 검색 버튼 클릭 시 호출되는 함수
+const onSearch = () => {
+  console.log('검색어:', searchQuery.value);
+  console.log('선택된 태그:', selectedTags.value);
+  console.log('선택된 지역:', selectedRegion.value);
+  console.log('선택된 구/군:', selectedDistrict.value);
+  // 검색 및 필터링 로직 추가
+};
+
+// 검색 조건에 따라 필터 데이터를 계산
+const activeFilters = computed(() => ({
+  query: searchQuery.value,
+  tags: selectedTags.value,
+  region: selectedRegion.value,
+  district: selectedDistrict.value
+}));
 </script>
 
 <style scoped>

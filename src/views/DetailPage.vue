@@ -17,39 +17,34 @@
         <PlaceMap :latitude="37.499613" :longitude="127.036431" />
       </div>
     </div>
-    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData"/>
+    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import DetailInfo from '@/components/component/DetailInfo.vue';
-import PlaceMap from '@/components/component/PlaceMap.vue';
-import CampsiteCardGrid from '@/components/layout/CampsiteCardGrid.vue';
-import TabMenu from '@/components/component/TabMenu.vue';
-import ReviewCardList from '@/components/layout/ReviewCardList.vue';
+<script setup>
+import { ref } from 'vue';
+import DetailInfo from '@/components/DetailInfo.vue';
+import PlaceMap from '@/components/PlaceMap.vue';
+import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
+import TabMenu from '@/components/TabMenu.vue';
+import ReviewCard2List from '@/layout/ReviewCard2List.vue';
 
-export default defineComponent({
-  name: 'ViewAttractions',
-  components: {
-    DetailInfo,
-    PlaceMap,
-    TabMenu
-  },
-  data() {
-    return {
-      tabs: [
-        { name: "tourist", label: "주변 관광지", component: CampsiteCardGrid },
-        { name: "camping", label: "캠핑장 리뷰", component: ReviewCardList },
-      ],
-      reviewData: [
-        { id: 1, name: '사용자1', rating: 4, content: '훌륭한 캠핑장이었습니다!' },
-        { id: 2, name: '사용자2', rating: 5, content: '깨끗하고 편안한 캠핑장이었어요.' },
-        { id: 3, name: '사용자3', rating: 3, content: '괜찮지만 약간 시끄러웠어요.' },
-      ],
-    };
-  },
-});
+const tabs = ref([
+  { name: 'tourist', label: '주변 관광지', component: CampsiteCardGrid },
+  { name: 'camping', label: '캠핑장 리뷰', component: ReviewCard2List },
+]);
+
+const reviewData = ref([
+{ id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
+  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
+  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+  { id: 4, title: '제목4', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
+  { id: 5, title: '제목5', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
+  { id: 6, title: '제목6', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+  { id: 7, title: '제목7', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
+  { id: 8, title: '제목8', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
+  { id: 9, title: '제목9', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+]);
 </script>
 
 <style scoped>
@@ -63,7 +58,7 @@ export default defineComponent({
 .image-container {
   position: relative;
   width: 100%;
-  height: 400px; /* 원하는 높이로 설정 */
+  height: 400px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -95,11 +90,10 @@ export default defineComponent({
 }
 
 .map-title {
-  font-size: 24px;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #333;
   padding-bottom: 20px;
-  font-size: 1.2rem;
   width: 100%;
   align-self: left;
 }

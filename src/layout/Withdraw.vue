@@ -1,17 +1,15 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="withdraw">
     <h2>탈퇴 안내</h2>
     <ul>
       <li>
         회원 탈퇴를 진행하면,
-        <b
-          >모든 개인 정보와 작성한 리뷰, 찜한 항목 등 서비스 이용 기록이
-          영구적으로 삭제</b
-        >되며, 복구가 불가능합니다.
+        <b>모든 개인 정보와 작성한 리뷰, 찜한 항목 등 서비스 이용 기록이 영구적으로 삭제</b>
+        되며, 복구가 불가능합니다.
       </li>
       <li>
-        탈퇴 후 동일한 이메일로 재가입이 가능합니다. 단, 삭제된 정보는 복구되지
-        않습니다.
+        탈퇴 후 동일한 이메일로 재가입이 가능합니다. 단, 삭제된 정보는 복구되지 않습니다.
       </li>
     </ul>
     <h2>확인 사항</h2>
@@ -20,19 +18,11 @@
       <li>탈퇴 절차는 아래 버튼을 클릭하여 계속 진행할 수 있습니다.</li>
     </ul>
   </div>
-  <ButtonDark class="withdrawal-confirm-button" label="탈퇴하기😭" />
+  <ButtonDark class="withdrawal-confirm-button" label="&nbsp;탈퇴하기 😭" />
 </template>
 
-<script>
-import ButtonDark from "../component/ButtonDark.vue";
-
-export default {
-  components: {
-    ButtonDark,
-  },
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: "Withdraw",
-};
+<script setup>
+import ButtonDark from "@/components/ButtonDark.vue";
 </script>
 
 <style scoped>

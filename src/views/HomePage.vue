@@ -1,56 +1,43 @@
 <template>
-    <div class="home">
+  <div class="home">
+    <ImageSlider
+      class="imageSlider"
+      :images="['/images/main(1).png', '/images/main(2).png', '/images/main(3).png']"
+      :interval="5000"
+    />
 
-        <ImageSlider class="imageSlider"
-            :images="['/images/main(1).png', '/images/main(2).png', '/images/main(3).png']"
-            :interval="5000"
-        />
-
-        <ButtonDark class="view-all-campsites" label="View All Campsites" @click="viewAll" />
-        <div>
-            <CampsiteCardGrid />
-        </div>
+    <ButtonDark class="view-all-campsites" label="View All Campsites" @click="viewAll" />
+    <div>
+      <CampsiteCardGrid />
     </div>
+  </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import { useRouter } from 'vue-router' // 이미 내장된 Vue Router 사용
-import CampsiteCardGrid from '@/components/layout/CampsiteCardGrid.vue';
-import ButtonDark from '@/components/component/ButtonDark.vue';
-import ImageSlider from '@/components/layout/ImageSlider.vue';
+<script setup>
+import { useRouter } from 'vue-router';
+import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
+import ButtonDark from '@/components/ButtonDark.vue';
+import ImageSlider from '@/layout/ImageSlider.vue';
 
-export default defineComponent({
-    name: 'HomePage',
-    components: {
-        CampsiteCardGrid,
-        ButtonDark,
-        ImageSlider
-    },
-    setup() {
-        const router = useRouter(); // router 인스턴스 가져오기
+const router = useRouter();
 
-        const viewAll = () => {
-            router.push('/viewCampsites');
-        };
-
-        return { viewAll };
-    }
-})
+const viewAll = () => {
+  router.push('/viewCampsites');
+};
 </script>
 
 <style scoped>
 .home {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .view-all-campsites {
-    margin: 25px;
+  margin: 25px;
 }
 
 .imageSlider {
-    margin: 25px
+  margin: 25px;
 }
 </style>

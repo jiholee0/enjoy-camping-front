@@ -3,7 +3,7 @@
     <button
       v-for="tag in tags"
       :key="tag"
-      :class="['tag-button', { active: tag === selectedTag } ]"
+      :class="['tag-button', { active: tag === selectedTag }]"
       @click="selectTag(tag)"
     >
       <span v-if="tag === selectedTag" class="check-icon">✓</span>
@@ -12,26 +12,20 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SingleTagFilter',
-  props: {
-    tags: {
-      type: Array,
-      required: true,
-    },
+<script setup>
+import { defineProps, ref } from 'vue';
+
+defineProps({
+  tags: {
+    type: Array,
+    required: true,
   },
-  data() {
-    return {
-      selectedTag: null,
-    };
-  },
-  methods: {
-    selectTag(tag) {
-      // 단일 선택을 위해 클릭한 태그를 selectedTag로 설정
-      this.selectedTag = this.selectedTag === tag ? null : tag;
-    },
-  },
+});
+
+const selectedTag = ref(null);
+
+const selectTag = (tag) => {
+  selectedTag.value = selectedTag.value === tag ? null : tag;
 };
 </script>
 

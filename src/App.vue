@@ -1,24 +1,26 @@
 <script setup>
-import Header from './components/layout/AppHeader.vue'
-import Footer from './components/layout/AppFooter.vue'
+import Header from "@/layout/AppHeader.vue";
+import Footer from "@/layout/AppFooter.vue";
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="app">
     <Header />
-    <main class="flex-grow main-content">
-      <router-view></router-view>
+    <main class="main-content">
+      <router-view />
     </main>
     <Footer />
   </div>
 </template>
 
-
 <style>
 .app-container {
-  min-width: 800px; /* 최소 너비 설정 */
-  min-height: 600px; /* 최소 높이 설정 */
-  overflow: auto; /* 최소 크기보다 작아지면 스크롤 허용 */
+  min-width: 800px;
+  /* 최소 너비 설정 */
+  min-height: 600px;
+  /* 최소 높이 설정 */
+  overflow: auto;
+  /* 최소 크기보다 작아지면 스크롤 허용 */
 }
 
 .main-content {
@@ -26,5 +28,32 @@ import Footer from './components/layout/AppFooter.vue'
   padding: 70px !important;
 }
 
+#app {
+  min-width: 1000px;
+  font-weight: normal;
+}
 
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  min-width: 1000px;
+}
+
+a {
+  text-decoration: none;
+  color: #2f6690;
+  transition: 0.4s;
+  padding: 4px;
+}
+
+a:hover {
+  color: #81c3d7 !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
 </style>

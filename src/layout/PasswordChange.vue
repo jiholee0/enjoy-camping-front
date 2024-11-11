@@ -4,8 +4,12 @@
       <div class="form-group">
         <label for="currentPassword">이전 비밀번호 입력</label>
         <div class="input-wrapper">
-          <input :type="showCurrentPassword ? 'text' : 'password'" id="currentPassword" v-model="currentPassword"
-            required />
+          <input
+            :type="showCurrentPassword ? 'text' : 'password'"
+            id="currentPassword"
+            v-model="currentPassword"
+            required
+          />
           <button type="button" class="eye-button" @click="toggleShowCurrentPassword">
             <img :src="showCurrentPassword ? '/images/eye.png' : '/images/closed-eye.png'" alt="Toggle visibility"
               class="eye-icon" />
@@ -27,8 +31,12 @@
       <div class="form-group">
         <label for="confirmPassword">변경 비밀번호 재입력</label>
         <div class="input-wrapper">
-          <input :type="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" v-model="confirmPassword"
-            required />
+          <input
+            :type="showConfirmPassword ? 'text' : 'password'"
+            id="confirmPassword"
+            v-model="confirmPassword"
+            required
+          />
           <button type="button" class="eye-button" @click="toggleShowConfirmPassword">
             <img :src="showConfirmPassword ? '/images/eye.png' : '/images/closed-eye.png'" alt="Toggle visibility"
               class="eye-icon" />
@@ -41,44 +49,37 @@
   </div>
 </template>
 
-<script>
-import ButtonDark from '../component/ButtonDark.vue';
+<script setup>
+import { ref } from 'vue';
+import ButtonDark from '@/components/ButtonDark.vue';
 
-export default {
-  components: {
-    ButtonDark,
-  },
-  name: 'PasswordChange',
-  data() {
-    return {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-      showCurrentPassword: false,
-      showNewPassword: false,
-      showConfirmPassword: false,
-    };
-  },
-  methods: {
-    toggleShowCurrentPassword() {
-      this.showCurrentPassword = !this.showCurrentPassword;
-    },
-    toggleShowNewPassword() {
-      this.showNewPassword = !this.showNewPassword;
-    },
-    toggleShowConfirmPassword() {
-      this.showConfirmPassword = !this.showConfirmPassword;
-    },
-    handlePasswordChange() {
-      if (this.newPassword !== this.confirmPassword) {
-        alert('변경 비밀번호가 일치하지 않습니다.');
-        return;
-      }
+const currentPassword = ref('');
+const newPassword = ref('');
+const confirmPassword = ref('');
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
 
-      console.log('비밀번호가 변경되었습니다.');
-      alert('비밀번호가 성공적으로 변경되었습니다.');
-    },
-  },
+const toggleShowCurrentPassword = () => {
+  showCurrentPassword.value = !showCurrentPassword.value;
+};
+
+const toggleShowNewPassword = () => {
+  showNewPassword.value = !showNewPassword.value;
+};
+
+const toggleShowConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
+const handlePasswordChange = () => {
+  if (newPassword.value !== confirmPassword.value) {
+    alert('변경 비밀번호가 일치하지 않습니다.');
+    return;
+  }
+
+  console.log('비밀번호가 변경되었습니다.');
+  alert('비밀번호가 성공적으로 변경되었습니다.');
 };
 </script>
 
@@ -86,7 +87,6 @@ export default {
 .password-change {
   width: 300px;
   padding: 20px;
-
 }
 
 .form-group {

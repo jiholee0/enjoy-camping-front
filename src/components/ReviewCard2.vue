@@ -10,24 +10,23 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ReviewCard2',
-  props: {
-    title: {
-      type: String,
-      required: true
-    },
-    content: {
-      type: String,
-      required: true
-    },
-    date: {
-      type: String,
-      required: true
-    }
-  }
-};
+<script setup>
+import { defineProps } from 'vue';
+
+defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  date: {
+    type: String,
+    required: true,
+  },
+});
 </script>
 
 <style scoped>

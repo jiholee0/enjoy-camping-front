@@ -22,26 +22,10 @@
       </ul>
     </nav>
     <div class="auth-buttons">
-      <ButtonLight
-        v-if="!isLoggedIn"
-        label="로그인"
-        @click.capture="login"
-      />
-      <ButtonLight
-        v-else
-        label="로그아웃"
-        @click.capture="logout"
-      />
-      <ButtonDark
-        v-if="!isLoggedIn"
-        label="회원가입"
-        @click.capture="signup"
-      />
-      <ButtonDark
-        v-else
-        label="마이페이지"
-        @click.capture="goToMyPage"
-      />
+      <ButtonLight v-if="!isLoggedIn" label="로그인" @click.capture="login" />
+      <ButtonLight v-else label="로그아웃" @click.capture="logout" />
+      <ButtonDark v-if="!isLoggedIn" label="회원가입" @click.capture="signup" />
+      <ButtonDark v-else label="마이페이지" @click.capture="goToMyPage" />
     </div>
   </header>
 
@@ -49,44 +33,39 @@
   <SignupModal :showModal="isSignupModalOpen" @close="isSignupModalOpen = false" />
 </template>
 
-<script>
-import LoginModal from '../../views/LoginPage.vue';
-import SignupModal from '../../views/SignupPage.vue';
-import ButtonDark from '../component/ButtonDark.vue';
-import ButtonLight from '../component/ButtonLight.vue';
+<script setup>
+import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import LoginModal from '@/views/LoginPage.vue';
+import SignupModal from '@/views/SignupPage.vue';
+import ButtonDark from '@/components/ButtonDark.vue';
+import ButtonLight from '@/components/ButtonLight.vue';
 
-export default {
-  components: {
-    LoginModal,
-    SignupModal,
-    ButtonDark,
-    ButtonLight
-  },
-  data() {
-    return {
-      // isLoggedIn: false,
-      isLoggedIn: true,
-      isLoginModalOpen: false,
-      isSignupModalOpen: false
-    };
-  },
-  methods: {
-    login() {
-      this.isLoginModalOpen = true;
-    },
-    signup() {
-      this.isSignupModalOpen = true;
-    },
-    logout() {
-      this.isLoggedIn = false;
-    },
-    goToMyPage() {
-      this.$router.push('/myPage'); // 마이페이지로 이동
-    },
-    isActive(path) {
-      return this.$route.path === path;
-    }
-  }
+const isLoggedIn = ref(true);
+const isLoginModalOpen = ref(false);
+const isSignupModalOpen = ref(false);
+
+const router = useRouter();
+const route = useRoute();
+
+const login = () => {
+  isLoginModalOpen.value = true;
+};
+
+const signup = () => {
+  isSignupModalOpen.value = true;
+};
+
+const logout = () => {
+  isLoggedIn.value = false;
+};
+
+const goToMyPage = () => {
+  router.push('/myPage'); // 마이페이지로 이동
+};
+
+const isActive = (path) => {
+  return route.path === path;
 };
 </script>
 
@@ -135,9 +114,9 @@ nav ul li a {
 }
 
 nav ul li.active a {
-  color: #0077b6; /* 활성화된 링크 색상 변경 */
-  font-weight: bold; /* 강조를 위한 볼드체 */
-  border-bottom: 2px solid #0077b6; /* 하단에 강조를 위한 border 추가 */
+  color: #0077b6;
+  font-weight: bold;
+  border-bottom: 2px solid #0077b6;
 }
 
 .auth-buttons {

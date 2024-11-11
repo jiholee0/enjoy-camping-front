@@ -35,92 +35,92 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 
-export default {
-  props: {
-    images: {
-      type: Array,
-      required: true,
-      validator: (value) => value.length > 0,
-    },
-    interval: {
-      type: Number,
-      default: 5000,
-    },
+const props = defineProps({
+  images: {
+    type: Array,
+    required: true,
+    validator: (value) => value.length > 0,
   },
-  setup(props) {
-    const currentIndex = ref(0);
-    const isLooping = ref(false);
-    let timer = null;
-
-    const prevSlideIndex = computed(() => (currentIndex.value === 0 ? props.images.length - 1 : currentIndex.value - 1));
-    const nextSlideIndex = computed(() => (currentIndex.value === props.images.length - 1 ? 0 : currentIndex.value + 1));
-
-    const getSlideClass = (index) => ({
-      'current-slide': currentIndex.value === index,
-      'prev-slide': prevSlideIndex.value === index,
-      'next-slide': nextSlideIndex.value === index,
-    });
-
-    const nextSlide = () => {
-      if (currentIndex.value === props.images.length - 1) {
-        isLooping.value = true;
-        currentIndex.value = -1;
-        setTimeout(() => {
-          isLooping.value = false;
-          currentIndex.value = 0;
-        }, 1);
-      } else {
-        currentIndex.value += 1;
-      }
-    };
-
-    const startSlider = () => {
-      timer = setInterval(nextSlide, props.interval);
-    };
-
-    const stopSlider = () => {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-    };
-
-    const goToSlide = (index) => {
-      currentIndex.value = index;
-      stopSlider();
-      startSlider();
-    };
-
-    const handleTransitionEnd = () => {
-      if (isLooping.value) {
-        isLooping.value = false;
-      }
-    };
-
-    const preloadImages = () => {
-      props.images.forEach((src) => {
-        const img = new Image();
-        img.src = src;
-      });
-    };
-
-    onMounted(() => {
-      preloadImages();
-      startSlider();
-    });
-    onUnmounted(stopSlider);
-
-    watch(() => props.interval, () => {
-      stopSlider();
-      startSlider();
-    });
-
-    return { currentIndex, goToSlide, handleTransitionEnd, isLooping, getSlideClass };
+  interval: {
+    type: Number,
+    default: 5000,
   },
+});
+
+const currentIndex = ref(0);
+const isLooping = ref(false);
+let timer = null;
+
+const prevSlideIndex = computed(() =>
+  currentIndex.value === 0 ? props.images.length - 1 : currentIndex.value - 1
+);
+const nextSlideIndex = computed(() =>
+  currentIndex.value === props.images.length - 1 ? 0 : currentIndex.value + 1
+);
+
+const getSlideClass = (index) => ({
+  'current-slide': currentIndex.value === index,
+  'prev-slide': prevSlideIndex.value === index,
+  'next-slide': nextSlideIndex.value === index,
+});
+
+const nextSlide = () => {
+  if (currentIndex.value === props.images.length - 1) {
+    isLooping.value = true;
+    currentIndex.value = -1;
+    setTimeout(() => {
+      isLooping.value = false;
+      currentIndex.value = 0;
+    }, 1);
+  } else {
+    currentIndex.value += 1;
+  }
 };
+
+const startSlider = () => {
+  timer = setInterval(nextSlide, props.interval);
+};
+
+const stopSlider = () => {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+};
+
+const goToSlide = (index) => {
+  currentIndex.value = index;
+  stopSlider();
+  startSlider();
+};
+
+const handleTransitionEnd = () => {
+  if (isLooping.value) {
+    isLooping.value = false;
+  }
+};
+
+const preloadImages = () => {
+  props.images.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
+};
+
+onMounted(() => {
+  preloadImages();
+  startSlider();
+});
+
+onUnmounted(stopSlider);
+
+watch(() => props.interval, () => {
+  stopSlider();
+  startSlider();
+});
 </script>
 
 <style scoped>

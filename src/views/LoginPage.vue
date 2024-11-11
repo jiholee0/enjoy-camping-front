@@ -1,70 +1,68 @@
 <template>
   <div v-if="showModal" class="modal-overlay" @click.self="startCloseModal">
-      <div
-          class="modal-container"
-          :class="{ 'modal-out': isClosing }"
-          @animationend="onAnimationEnd"
-      >
-          <h2 class="modal-title">로그인</h2>
-          <form @submit.prevent="handleLogin">
-              <div class="form-group">
-                  <label for="email">이메일</label>
-                  <input type="email" id="email" v-model="email" placeholder="이메일 입력" required />
-              </div>
-              <div class="form-group">
-                  <label for="password">비밀번호</label>
-                  <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
-              </div>
-              <div class="form-actions">
-                  <ButtonDark label="로그인" @click.capture="handleLogin" />
-              </div>
-          </form>
-          <div class="additional-actions">
-              <ButtonLight label="비밀번호 찾기" @click.capture="forgotPassword" />
-          </div>
+    <div
+      class="modal-container"
+      :class="{ 'modal-out': isClosing }"
+      @animationend="onAnimationEnd"
+    >
+      <h2 class="modal-title">로그인</h2>
+      <form @submit.prevent="handleLogin">
+        <div class="form-group">
+          <label for="email">이메일</label>
+          <input type="email" id="email" v-model="email" placeholder="이메일 입력" required />
+        </div>
+        <div class="form-group">
+          <label for="password">비밀번호</label>
+          <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
+        </div>
+        <div class="form-actions">
+          <ButtonDark label="로그인" @click.capture="handleLogin" />
+        </div>
+      </form>
+      <div class="additional-actions">
+        <ButtonLight label="비밀번호 찾기" @click.capture="forgotPassword" />
       </div>
+    </div>
   </div>
 </template>
 
-<script>
-import ButtonDark from '../components/component/ButtonDark.vue';
-import ButtonLight from '../components/component/ButtonLight.vue';
+<script setup>
+import { ref } from 'vue';
+import { defineProps, defineEmits } from 'vue';
+import ButtonDark from '@/components/ButtonDark.vue';
+import ButtonLight from '@/components/ButtonLight.vue';
 
-export default {
-  components: {
-      ButtonDark,
-      ButtonLight
+defineProps({
+  showModal: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-      showModal: {
-          type: Boolean,
-          default: false
-      }
-  },
-  data() {
-      return {
-          isClosing: false
-      };
-  },
-  methods: {
-      startCloseModal() {
-          this.isClosing = true;
-      },
-      onAnimationEnd() {
-          if (this.isClosing) {
-              this.isClosing = false;
-              this.$emit('close');
-          }
-      },
-      handleLogin() {
-          console.log("Email:", this.email);
-          console.log("Password:", this.password);
-          this.startCloseModal();
-      },
-      forgotPassword() {
-          alert("비밀번호 찾기 기능을 구현하세요.");
-      }
+});
+
+const emit = defineEmits(['close']);
+const email = ref('');
+const password = ref('');
+const isClosing = ref(false);
+
+const startCloseModal = () => {
+  isClosing.value = true;
+};
+
+const onAnimationEnd = () => {
+  if (isClosing.value) {
+    isClosing.value = false;
+    emit('close');
   }
+};
+
+const handleLogin = () => {
+  console.log("Email:", email.value);
+  console.log("Password:", password.value);
+  startCloseModal();
+};
+
+const forgotPassword = () => {
+  alert("비밀번호 찾기 기능을 구현하세요.");
 };
 </script>
 

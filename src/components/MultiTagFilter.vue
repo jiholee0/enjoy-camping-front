@@ -13,30 +13,25 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'MultiTagFilter',
-  props: {
-    tags: {
-      type: Array,
-      default: () => [],
-    },
+<script setup>
+import { defineProps, ref } from 'vue';
+
+defineProps({
+  tags: {
+    type: Array,
+    default: () => [],
   },
-  data() {
-    return {
-      selectedTags: [],
-    };
-  },
-  methods: {
-    toggleTag(tag) {
-      if (this.selectedTags.includes(tag)) {
-        this.selectedTags = this.selectedTags.filter(t => t !== tag);
-      } else {
-        this.selectedTags.push(tag);
-      }
-    },
-  },
-};
+});
+
+const selectedTags = ref([]);
+
+function toggleTag(tag) {
+  if (selectedTags.value.includes(tag)) {
+    selectedTags.value = selectedTags.value.filter(t => t !== tag);
+  } else {
+    selectedTags.value.push(tag);
+  }
+}
 </script>
 
 <style scoped>

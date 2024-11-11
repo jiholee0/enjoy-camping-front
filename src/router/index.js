@@ -2,9 +2,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 // 컴포넌트 가져오기
-import Home from "../views/HomePage.vue";
-import ViewCampsites from "../views/ViewCampsites.vue";
-import ViewAttractions from "../views/ViewAttractions.vue";
+import Home from "@/views/HomePage.vue";
+import ViewCampsites from "@/views/ViewCampsites.vue";
+import ViewAttractions from "@/views/ViewAttractions.vue";
 import DetailPage from "@/views/DetailPage.vue";
 import MyPage from "@/views/MyPage.vue";
 

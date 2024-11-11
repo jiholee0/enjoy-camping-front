@@ -10,25 +10,20 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'SearchBar',
-  props: {
-    label: {
-      type: String,
-      default: '검색어를 입력하세요.',
-    },
+<script setup>
+import { ref, defineProps } from 'vue';
+
+defineProps({
+  label: {
+    type: String,
+    default: '검색어를 입력하세요.',
   },
-  data() {
-    return {
-      searchText: '', // 입력값을 저장하는 변수
-    };
-  },
-  methods: {
-    clearSearch() {
-      this.searchText = ''; // 입력값 초기화
-    },
-  },
+});
+
+const searchText = ref('');
+
+const clearSearch = () => {
+  searchText.value = '';
 };
 </script>
 
@@ -74,7 +69,7 @@ export default {
   cursor: pointer;
   color: #888;
   transition: color 0.3s ease;
-  user-select: none; /* 텍스트 선택 방지 */
+  user-select: none;
 }
 
 .clear-icon:hover {

@@ -8,42 +8,34 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
+<script setup>
 import { useRouter } from 'vue-router';
+import { defineProps } from 'vue';
 
-export default defineComponent({
-  name: 'ReviewCard',
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    rating: {
-      type: Number,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-    id: {
-      type: Number,
-      required: true,
-    },
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
   },
-  setup(props) {
-    const router = useRouter();
-
-    const goToDetail = () => {
-      router.push({ name: 'DetailPage', params: { id: props.id } });
-    };
-
-    return {
-      goToDetail,
-    };
+  rating: {
+    type: Number,
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  id: {
+    type: Number,
+    required: true,
   },
 });
+
+const router = useRouter();
+
+const goToDetail = () => {
+  router.push({ name: 'DetailPage', params: { id: props.id } });
+};
 </script>
 
 <style scoped>

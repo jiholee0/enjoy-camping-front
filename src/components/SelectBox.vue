@@ -11,21 +11,20 @@
   </select>
 </template>
 
-<script>
-export default {
-  name: 'SelectBox',
-  props: {
-    options: {
-      type: Array,
-      required: true,
-      default: () => [],
-    },
-    placeholder: {
-      type: String,
-      default: 'Sort by',
-    },
+<script setup>
+import { defineProps } from 'vue';
+
+defineProps({
+  options: {
+    type: Array,
+    required: true,
+    default: () => [],
   },
-};
+  placeholder: {
+    type: String,
+    default: 'Sort by',
+  },
+});
 </script>
 
 <style scoped>

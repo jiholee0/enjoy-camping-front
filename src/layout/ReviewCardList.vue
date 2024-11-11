@@ -14,21 +14,16 @@
   </div>
 </template>
 
-<script>
-import ReviewCard from '@/components/component/ReviewCard.vue';
+<script setup>
+import { defineProps } from 'vue';
+import ReviewCard from '@/components/ReviewCard.vue';
 
-export default {
-  components: {
-    ReviewCard,
+defineProps({
+  reviews: {
+    type: Array,
+    required: true,
   },
-  name: 'ReviewList',
-  props: {
-    reviews: {
-      type: Array,
-      required: true,
-    },
-  },
-};
+});
 </script>
 
 <style scoped>
