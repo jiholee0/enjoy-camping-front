@@ -129,7 +129,6 @@ const forgotPassword = () => {
 .form-group label {
   display: block;
   margin-bottom: 0.5em;
-  font-weight: bold;
 }
 
 .form-group input {
