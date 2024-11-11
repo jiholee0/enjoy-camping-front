@@ -19,16 +19,26 @@ const props = defineProps({
   address: String,
   description: String,
   image: String,
-  id: Number
+  id: Number,
+  type: String
 });
 
 const router = useRouter();
 
 function goToDetail() {
+  const routeName = props.type === 'attraction' ? 'AttractionDetailPage' : 'CampsiteDetailPage';
+
   router.push({
-    name: 'DetailPage',
+    name: routeName,
     params: {
-      id: props.id
+      id: props.id.toString()
+    },
+
+    query: {
+      name: props.name,
+      address: props.address,
+      description: props.description,
+      image: props.image
     }
   });
 }

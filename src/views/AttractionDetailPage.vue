@@ -3,11 +3,11 @@
     <div class="image-container">
       <img src="/images/CampingExampleImage.png" alt="캠핑장 이미지" class="background-image" />
       <DetailInfo
-        name="홍승찬 캠핑장"
-        description="홍승찬 사장님이 운영하는 캠핑장"
-        tel="010-0000-0000"
-        addr="역삼 테헤란로 멀티캠퍼스"
-        link="https://www.example.com"
+        :name="name"
+        :description=description
+        :tel="tel || '010-0000-0000'"
+        :address="address || '역삼 테헤란로 멀티캠퍼스'"
+        :link="link || 'https://www.example.com'"
         class="detail-info-overlay"
       />
     </div>
@@ -23,6 +23,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import DetailInfo from '@/components/DetailInfo.vue';
 import PlaceMap from '@/components/PlaceMap.vue';
 import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
@@ -45,6 +46,13 @@ const reviewData = ref([
   { id: 8, title: '제목8', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
   { id: 9, title: '제목9', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
 ]);
+
+const route = useRoute();
+
+const name = route.query.name;
+const address = route.query.address;
+const description = route.query.description;
+// const image = route.query.image;
 </script>
 
 <style scoped>

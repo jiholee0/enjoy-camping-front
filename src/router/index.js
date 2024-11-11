@@ -5,7 +5,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/HomePage.vue";
 import ViewCampsites from "@/views/ViewCampsites.vue";
 import ViewAttractions from "@/views/ViewAttractions.vue";
-import DetailPage from "@/views/DetailPage.vue";
+import AttractionDetailPage from "@/views/AttractionDetailPage.vue";
+import CampsiteDetailPage from "@/views/CampsiteDetailPage.vue";
 import MyPage from "@/views/MyPage.vue";
 
 const routes = [
@@ -16,7 +17,18 @@ const routes = [
     name: "ViewAttractions",
     component: ViewAttractions,
   },
-  { path: "/detail", name: "DetailPage", component: DetailPage },
+  {
+    path: "/detail/attractions/:id",
+    name: "AttractionDetailPage",
+    component: AttractionDetailPage,
+    props: true,
+  },
+  {
+    path: "/detail/campings/:id",
+    name: "CampsiteDetailPage",
+    component: CampsiteDetailPage,
+    props: true,
+  },
   { path: "/myPage", name: "MyPage", component: MyPage },
 ];
 

@@ -32,7 +32,6 @@ const itemsPerPage = ref(5);
 
 const totalPages = computed(() => Math.ceil(props.reviews.length / itemsPerPage.value));
 
-// Compute paginated reviews with truncated content if longer than 300 characters
 const paginatedReviews = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
