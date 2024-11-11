@@ -1,18 +1,18 @@
 <template>
   <div class="viewCampsites">
-    <!-- Search Bar -->
-    <div class="search-container">
-      <SearchBar label="캠핑장 검색하기" v-model="searchQuery" />
-      <ButtonDark class="search-button" @click="onSearch" label="검색" />
-    </div>
-
     <!-- Filters Container -->
     <div class="filters-container">
       <div class="select-group">
         <SelectBox :options="regionOptions" placeholder="시/도 선택" v-model="selectedRegion" />
         <SelectBox :options="districtOptions" placeholder="구/군 선택" v-model="selectedDistrict" />
       </div>
-      <SingleTagFilter :tags="sortOptions" v-model="selectedSort" />
+      <SingleTagFilter class="single-tag-filter" :tags="sortOptions" v-model="selectedSort" />
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+      <SearchBar label="캠핑장 검색하기" v-model="searchQuery" />
+      <ButtonDark class="search-button" @click="onSearch" label="검색" />
     </div>
 
     <!-- Campsite Grid -->
@@ -75,11 +75,12 @@ const onSearch = () => {
 
 .filters-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
   align-items: center;
+  gap: 20px;
   width: 100%;
   max-width: 800px;
-  margin-bottom: 24px;
+  margin-top: 24px;
 }
 
 .select-group {

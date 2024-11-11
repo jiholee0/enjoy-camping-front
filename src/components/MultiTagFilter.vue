@@ -43,7 +43,7 @@ function toggleTag(tag) {
 .tag {
   padding: 4px 8px;
   font-size: 11px;
-  height: 32px;
+  height: 28px;
   display: flex;
   align-items: center;
   background-color: #f0f0f0;
@@ -54,7 +54,7 @@ function toggleTag(tag) {
 }
 
 .tag-selected {
-  background-color: #0077b6;
+  background-color: #435965;
   color: white;
   padding-left: 4px;
 }
