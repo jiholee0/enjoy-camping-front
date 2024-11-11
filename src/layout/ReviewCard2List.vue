@@ -9,7 +9,7 @@
       v-for="review in paginatedReviews"
       :key="review.id"
       :title="review.title"
-      :content="review.content"
+      :content="review.displayContent"
       :date="review.date"
     />
   </div>
@@ -32,10 +32,17 @@ const itemsPerPage = ref(5);
 
 const totalPages = computed(() => Math.ceil(props.reviews.length / itemsPerPage.value));
 
+// Compute paginated reviews with truncated content if longer than 300 characters
 const paginatedReviews = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return props.reviews.slice(start, end);
+
+  return props.reviews.slice(start, end).map((review) => ({
+    ...review,
+    displayContent: review.content.length > 100
+      ? review.content.slice(0, 100) + '...'
+      : review.content,
+  }));
 });
 
 const nextPage = () => {
