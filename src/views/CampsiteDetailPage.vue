@@ -26,13 +26,13 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import DetailInfo from '@/components/DetailInfo.vue';
 import PlaceMap from '@/components/PlaceMap.vue';
-import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
+import AttractionCardGrid from '@/layout/AttractionCardGrid.vue';
 import TabMenu from '@/components/TabMenu.vue';
 import ReviewCard2List from '@/layout/ReviewCard2List.vue';
 
 // 탭 및 리뷰 데이터 설정
 const tabs = ref([
-  { name: 'tourist', label: '주변 관광지', component: CampsiteCardGrid },
+  { name: 'tourist', label: '주변 관광지', component: AttractionCardGrid },
   { name: 'camping', label: '캠핑장 리뷰', component: ReviewCard2List },
 ]);
 

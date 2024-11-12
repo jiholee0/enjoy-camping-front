@@ -17,7 +17,7 @@
         <PlaceMap :latitude="37.499613" :longitude="127.036431" />
       </div>
     </div>
-    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
+    <TabMenu class="tab-menu" :tabs="tabs" />
   </div>
 </template>
 
@@ -28,23 +28,9 @@ import DetailInfo from '@/components/DetailInfo.vue';
 import PlaceMap from '@/components/PlaceMap.vue';
 import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
 import TabMenu from '@/components/TabMenu.vue';
-import ReviewCard2List from '@/layout/ReviewCard2List.vue';
 
 const tabs = ref([
-  { name: 'tourist', label: '주변 관광지', component: CampsiteCardGrid },
-  { name: 'camping', label: '캠핑장 리뷰', component: ReviewCard2List },
-]);
-
-const reviewData = ref([
-{ id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  { id: 4, title: '제목4', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 5, title: '제목5', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 6, title: '제목6', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  { id: 7, title: '제목7', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 8, title: '제목8', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 9, title: '제목9', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+  { name: 'tourist', label: '주변 캠핑장', component: CampsiteCardGrid },
 ]);
 
 const route = useRoute();
