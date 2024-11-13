@@ -26,7 +26,7 @@ const props = defineProps({
 const router = useRouter();
 
 function goToDetail() {
-  const routeName = props.type === 'attraction' ? 'AttractionDetailPage' : 'CampsiteDetailPage';
+  const routeName = props.type === 'attractions' ? 'AttractionDetailPage' : 'CampsiteDetailPage';
 
   router.push({
     name: routeName,
