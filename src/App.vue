@@ -34,8 +34,8 @@ import Footer from "@/layout/structure/AppFooter.vue";
 }
 
 body {
-  font-family: "Noto Sans KR", sans-serif;
-  min-width: 1000px;
+    font-family: "Noto Sans KR", sans-serif;
+    min-width: 1000px;
 }
 
 a {

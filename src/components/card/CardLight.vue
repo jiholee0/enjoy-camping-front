@@ -1,11 +1,13 @@
 <!-- Card.vue -->
 <template>
   <div class="card" @click="goToDetail">
-    <img :src="image" alt="이미지" class="card-image" />
+    <div class="image-wrapper">
+      <img :src="imageUrl ? imageUrl : NoImage" alt="이미지" class="card-image" />
+    </div>
     <div class="card-content">
       <h3>{{ name }}</h3>
-      <p>{{ address }}</p>
-      <p>{{ description }}</p>
+      <p>{{ detailAddress }}</p>
+      <p v-if="introduction">{{ introduction }}</p>
     </div>
   </div>
 </template>
@@ -13,12 +15,13 @@
 <script setup>
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
+import NoImage from '/images/NoImage.png';
 
 const props = defineProps({
   name: String,
-  address: String,
-  description: String,
-  image: String,
+  detailAddress: String,
+  introduction: String,
+  imageUrl: String,
   id: Number,
   type: String
 });
@@ -36,9 +39,9 @@ function goToDetail() {
 
     query: {
       name: props.name,
-      address: props.address,
-      description: props.description,
-      image: props.image
+      detailAddress: props.detailAddress,
+      introduction: props.introduction,
+      imageUrl: props.imageUrl
     }
   });
 }
@@ -59,9 +62,14 @@ function goToDetail() {
   transition: box-shadow 0.3s ease-in-out !important;
 }
 
+.image-wrapper {
+  height: 50%;
+  overflow: hidden;
+}
+
 .card-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   align-self: center;
 }
