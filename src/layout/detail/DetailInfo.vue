@@ -2,11 +2,11 @@
   <div class="detail-info">
     <div>
       <h2 class="h2">{{ name }}</h2>
-      <p class="p1">{{ description }}</p>
-      <p class="p2">tel. {{ tel }}</p>
-      <p class="p2">addr. {{ addr }}</p>
+      <p class="p1" v-if="description">{{ description }}</p>
+      <p class="p2" v-if="tel">{{ tel }}</p>
+      <p class="p2" v-if="addr">{{ addr }}</p>
     </div>
-    <ButtonDark @click.capture="openLink" class="website-button" label="웹사이트로 이동하기 🔗" />
+    <ButtonDark v-if="link" @click.capture="openLink" class="website-button" label="웹사이트로 이동하기 🔗" />
   </div>
 </template>
 

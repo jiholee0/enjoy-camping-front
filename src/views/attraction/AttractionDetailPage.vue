@@ -1,20 +1,20 @@
 <template>
   <div class="detail-page">
     <div class="image-container">
-      <img src="/images/CampingExampleImage.png" alt="캠핑장 이미지" class="background-image" />
+      <img v-if="image" :src="image" alt="관광지 이미지" class="background-image" />
       <DetailInfo
-        :name="name"
-        :description=description
-        :tel="tel || '010-0000-0000'"
-        :address="address || '역삼 테헤란로 멀티캠퍼스'"
-        :link="link || 'https://www.example.com'"
+        :name="title"
+        :description="overview"
+        :tel="tel"
+        :addr="address"
+        :link="homepage"
         class="detail-info-overlay"
       />
     </div>
     <div class="map-container">
       <div class="map-title">위치 정보</div>
       <div class="map">
-        <PlaceMap :latitude="37.499613" :longitude="127.036431" />
+        <PlaceMap :latitude="latitude" :longitude="longitude" />
       </div>
     </div>
     <TabMenu class="tab-menu" :tabs="tabs" />
@@ -22,12 +22,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import DetailInfo from '@/layout/detail/DetailInfo.vue';
 import PlaceMap from '@/components/map/PlaceMap.vue';
 import CampsiteCardGrid from '@/layout/grid/CampsiteCardGrid.vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
+import { getAttractionDetail } from '@/api/attractionApi';
 
 const tabs = ref([
   { name: 'tourist', label: '주변 캠핑장', component: CampsiteCardGrid },
@@ -35,10 +36,35 @@ const tabs = ref([
 
 const route = useRoute();
 
-const name = route.query.name;
-const address = route.query.address;
-const description = route.query.description;
-// const image = route.query.image;
+// 상태 변수 정의
+const title = ref('');
+const address = ref('');
+const overview = ref('');
+const tel = ref('');
+const homepage = ref('');
+const image = ref('');
+const latitude = ref(37.499613); // 기본값 설정
+const longitude = ref(127.036431); // 기본값 설정
+
+onMounted(async () => {
+  try {
+    const id = route.params.id; // 경로에서 id 가져오기
+    const response = await getAttractionDetail(id); // API 호출
+    const data = response.data.result;
+
+    // 응답 데이터를 상태 변수에 설정
+    title.value = data.title || '';
+    address.value = data.addr1 + data.addr2 || '';
+    overview.value = data.overview || '';
+    tel.value = data.tel || '';
+    homepage.value = data.homepage || '';
+    image.value = data.firstImage1 || data.firstImage2 || '';
+    latitude.value = data.latitude || 0;
+    longitude.value = data.longitude || 0;
+  } catch (error) {
+    console.error('Failed to fetch detail data:', error);
+  }
+});
 </script>
 
 <style scoped>

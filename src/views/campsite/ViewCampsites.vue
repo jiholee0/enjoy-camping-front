@@ -27,7 +27,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';import { getCampings } from '@/api/campsiteApi.js';
+import { ref, onMounted, computed } from 'vue';
+import { getCampings } from '@/api/campsiteApi.js';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
 import SingleTagFilter from '@/components/filter/SingleTagFilter.vue';
@@ -72,8 +73,6 @@ const fetchCampings = async (page = 1) => {
     const response = await getCampings(page, itemsPerPage, 'name', 'asc');
     campings.value = response.data.result;
     totalItems.value = response.data.totalCount;
-
-    console.log(campings.value);
   } catch (error) {
     console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);
   }

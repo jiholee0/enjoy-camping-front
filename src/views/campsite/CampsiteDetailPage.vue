@@ -1,20 +1,25 @@
 <template>
   <div class="detail-page">
-    <div class="image-container">
-      <img src="/images/CampingExampleImage.png" alt="캠핑장 이미지" class="background-image" />
+    <div class="image-container" :class="{ 'no-image': !image }">
+      <template v-if="image">
+        <img :src="image" alt="캠핑장 이미지" class="background-image" @error="handleImageError"/>
+        <div class="gradient-overlay"></div>
+      </template>
+      <div v-else class="no-image-container"></div>
+
       <DetailInfo
         :name="name"
         :description="description"
-        :tel="tel || '010-0000-0000'"
-        :address="address || '역삼 테헤란로 멀티캠퍼스'"
-        :link="link || 'https://www.example.com'"
+        :tel="tel"
+        :addr="addr"
+        :link="link"
         class="detail-info-overlay"
       />
     </div>
-    <div class="map-container">
+    <div class="map-container" v-if="latitude !== 0 && longitude !== 0">
       <div class="map-title">위치 정보</div>
       <div class="map">
-        <PlaceMap :latitude="37.499613" :longitude="127.036431" />
+        <PlaceMap :latitude="latitude" :longitude="longitude" />
       </div>
     </div>
     <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
@@ -29,6 +34,7 @@ import PlaceMap from '@/components/map/PlaceMap.vue';
 import AttractionCardGrid from '@/layout/grid/AttractionCardGrid.vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
 import ReviewCard2List from '@/layout/list/ReviewCard2List.vue';
+import { getCampsiteDetail } from '@/api/campsiteApi';
 
 // 탭 및 리뷰 데이터 설정
 const tabs = ref([
@@ -46,20 +52,42 @@ const reviewData = ref([
 // 라우터에서 전달된 query 데이터 가져오기
 const route = useRoute();
 
-const name = ref(route.query.name || '기본 이름');
-const address = ref(route.query.address || '기본 주소');
-const description = ref(route.query.description || '기본 설명');
-const image = ref(route.query.image || '/images/CampingExampleImage.png');
-const tel = ref('010-0000-0000'); // 기본 전화번호 설정
-const link = ref('https://www.example.com'); // 기본 링크 설정
+// 상태 변수 정의
+const name = ref('');
+const addr = ref('');
+const description = ref('');
+const tel = ref('');
+const link = ref('');
+const image = ref('');
+const latitude = ref(0); // 기본값 설정
+const longitude = ref(0); // 기본값 설정
 
 // 데이터 업데이트 시점에 따라 reactivity 추가
-onMounted(() => {
-  name.value = route.query.name || name.value;
-  address.value = route.query.address || address.value;
-  description.value = route.query.description || description.value;
-  image.value = route.query.image || image.value;
+onMounted(async() => {
+  try {
+    const id = route.params.id; // 경로에서 id 가져오기
+    const response = await getCampsiteDetail(id); // API 호출
+    const data = response.data.result;
+
+    // 응답 데이터를 상태 변수에 설정
+    name.value = data.name || '';
+    addr.value = data.detailAddress || '';
+    description.value = data.introduction || '';
+    tel.value = data.telephone || '';
+    link.value = data.homepageUrl || '';
+    image.value = data.imageUrl || '';
+    latitude.value = data.latitude || 0;
+    longitude.value = data.longitude || 0;
+  } catch (error) {
+    console.error('Failed to fetch detail data:', error);
+  }
 });
+
+// 이미지 에러 핸들러
+const handleImageError = (event) => {
+  image.value = '';
+  event.target.src = '';
+};
 </script>
 
 <style scoped>
@@ -82,17 +110,53 @@ onMounted(() => {
 
 .background-image {
   width: 90%;
-  height: auto;
+  height: 100%;
   max-width: 1000px;
   object-fit: cover;
-  object-position: center;
+}
+
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+}
+
+.no-image-container {
+  height: 0;
 }
 
 .detail-info-overlay {
   position: absolute;
+  bottom: 0;
   width: 90%;
   max-width: 1000px;
-  height: 50%;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    transparent 100%
+  );
+}
+
+.image-container.no-image {
+  height: 200px;
+}
+
+.image-container.no-image .detail-info-overlay {
+  position: relative;
+  bottom: auto;
+  margin-top: 20px;
+  padding: 0 !important;
 }
 
 .map-container {
@@ -132,4 +196,5 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
 }
+
 </style>

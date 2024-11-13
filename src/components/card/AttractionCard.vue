@@ -2,20 +2,20 @@
   <div class="card" @click="goToDetail">
     <div class="card-inner">
       <div class="image-container">
-        <img :src="imageUrl ? imageUrl : NoImage" :alt="name" class="card-image" />
+        <img :src="firstImage1 ? firstImage1 : NoImage" :alt="title" class="card-image" @error="handleImageError"/>
         <div class="gradient-overlay"></div>
-        <div class="type-badge" v-if="type">
-          {{ type === 'attractions' ? '관광지' : '캠핑장' }}
+        <div class="type-badge">
+          {{ contentTypeName }}
         </div>
       </div>
       <div class="content-wrapper">
         <div class="card-content">
-          <h3 class="card-title">{{ name }}</h3>
+          <h3 class="card-title">{{ title }}</h3>
           <p class="card-address">
             <span class="location-icon">📍</span>
-            {{ detailAddress }}
+            {{ addr1 }} {{ addr2 }}
           </p>
-          <p v-if="introduction" class="card-intro">{{ introduction }}</p>
+          <p v-if="overview" class="card-intro">{{ overview }}</p>
         </div>
       </div>
     </div>
@@ -23,38 +23,49 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import NoImage from '/images/NoImage.png';
+import { getContentType } from '@/api/contentTypeApi';
 
 const props = defineProps({
-  name: String,
-  detailAddress: String,
-  introduction: String,
-  imageUrl: String,
-  id: Number,
-  type: String
+  title: String,
+  addr1: String,
+  addr2: String,
+  overview: String,
+  firstImage1: String,
+  no: Number,
+  contentTypeId: Number
 });
 
 const router = useRouter();
+const contentTypeName = ref(''); // 초기값은 빈 문자열로 설정
+
+onMounted(async () => {
+  try {
+    const response = await getContentType(props.contentTypeId);
+    contentTypeName.value = response.data.result.name;
+  } catch (error) {
+    console.error('Failed to fetch content type name:', error);
+    contentTypeName.value = '관광지'; // 오류 시 기본값 설정
+  }
+});
 
 function goToDetail() {
-  const routeName = props.type === 'attractions'
-    ? 'AttractionDetailPage'
-    : 'CampsiteDetailPage';
-
+  const routeName = 'Attraction' + 'DetailPage';
   router.push({
     name: routeName,
-    params: { id: props.id.toString() },
-    query: {
-      name: props.name,
-      detailAddress: props.detailAddress,
-      introduction: props.introduction,
-      imageUrl: props.imageUrl
-    }
+    params: { id: props.no },
   });
 }
+
+// 이미지 에러 핸들러
+const handleImageError = (event) => {
+  event.target.src = NoImage; // 이미지 로드 실패 시 대체 이미지로 설정
+};
 </script>
+
 
 <style scoped>
 .card {

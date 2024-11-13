@@ -11,19 +11,24 @@
 
     <!-- Search Bar with Search Button -->
     <div class="search-container">
-      <SearchBar label="캠핑장 검색하기" v-model="searchQuery" />
+      <SearchBar label="관광지 검색하기" v-model="searchQuery" />
       <ButtonDark class="search-button" @click="onSearch" label="검색"/>
     </div>
 
     <!-- Tourist Site Grid -->
     <div class="attraction-grid">
-      <AttractionCardGrid :filters="activeFilters" />
+      <AttractionCardGrid
+        :attractions="attractions"
+        :total-pages="totalPages"
+        :current-page="currentPage"
+        @change-page="fetchAttractions" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { getAttractions } from '@/api/attractionApi.js';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
 import MultiTagFilter from '@/components/filter/MultiTagFilter.vue';
@@ -49,19 +54,34 @@ const districtOptions = ref([
 // 검색 버튼 클릭 시 호출되는 함수
 const onSearch = () => {
   console.log('검색어:', searchQuery.value);
-  console.log('선택된 태그:', selectedTags.value);
   console.log('선택된 지역:', selectedRegion.value);
   console.log('선택된 구/군:', selectedDistrict.value);
-  // 검색 및 필터링 로직 추가
+  console.log('선택된 태그:', selectedTags.value);
+  // 검색 기능 로직을 추가할 수 있습니다
 };
 
-// 검색 조건에 따라 필터 데이터를 계산
-const activeFilters = computed(() => ({
-  query: searchQuery.value,
-  tags: selectedTags.value,
-  region: selectedRegion.value,
-  district: selectedDistrict.value
-}));
+const attractions = ref([]); // 관광지 목록 데이터
+const currentPage = ref(1);
+const itemsPerPage = 9;
+const totalItems = ref(0);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+
+// 페이지에 따른 관광지 데이터를 API에서 가져오는 함수
+const fetchAttractions = async (page = 1) => {
+  currentPage.value = page;
+  try {
+    const response = await getAttractions(page, itemsPerPage, 'title', 'asc');
+    attractions.value = response.data.result;
+    totalItems.value = response.data.totalCount;
+  } catch (error) {
+    console.error("관광지 데이터를 불러오는 중 오류가 발생했습니다:", error);
+  }
+};
+
+// 컴포넌트가 마운트될 때 관광지 데이터를 로드
+onMounted(() => {
+  fetchAttractions();
+});
 </script>
 
 <style scoped>

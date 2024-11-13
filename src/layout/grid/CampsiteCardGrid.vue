@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import Card from '@/components/card/CardLight.vue';
+import Card from '@/components/card/CampsiteCard.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 
 // Props로 데이터를 전달받음
