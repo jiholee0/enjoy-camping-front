@@ -4,7 +4,7 @@
       v-for="tag in tags"
       :key="tag"
       :class="['tag-button', { active: tag === selectedTag }]"
-      @click="selectTag(tag)"
+      @click="toggleTag(tag)"
     >
       <span v-if="tag === selectedTag" class="check-icon">✓</span>
       {{ tag }}
@@ -13,20 +13,37 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue';
+import { defineProps, defineEmits, ref, watch } from 'vue';
 
-defineProps({
+// Props 및 Emit 정의
+const props = defineProps({
   tags: {
     type: Array,
     required: true,
   },
+  modelValue: {
+    type: String,
+    default: null,
+  },
 });
 
-const selectedTag = ref(null);
+const emit = defineEmits(['update:modelValue']);
+const selectedTag = ref(props.modelValue || props.tags[0]); // 초기값 설정
 
-const selectTag = (tag) => {
-  selectedTag.value = selectedTag.value === tag ? null : tag;
+// 버튼 클릭 시 태그 선택 및 취소 로직
+const toggleTag = (tag) => {
+  if (selectedTag.value === tag) {
+    selectedTag.value = tag; // 선택 취소 대신 그대로 유지
+  } else {
+    selectedTag.value = tag;
+  }
+  emit('update:modelValue', selectedTag.value); // 부모 컴포넌트로 값 전달
 };
+
+// modelValue가 변경될 때 selectedTag 업데이트
+watch(() => props.modelValue, (newVal) => {
+  selectedTag.value = newVal;
+});
 </script>
 
 <style scoped>
@@ -50,7 +67,7 @@ const selectTag = (tag) => {
 }
 
 .tag-button.active {
-  background-color: #435965;;
+  background-color: #435965;
   color: white;
   padding-left: 4px;
 }

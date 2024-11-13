@@ -1,13 +1,23 @@
-<!-- Card.vue -->
 <template>
   <div class="card" @click="goToDetail">
-    <div class="image-wrapper">
-      <img :src="imageUrl ? imageUrl : NoImage" alt="이미지" class="card-image" />
-    </div>
-    <div class="card-content">
-      <h3>{{ name }}</h3>
-      <p>{{ detailAddress }}</p>
-      <p v-if="introduction">{{ introduction }}</p>
+    <div class="card-inner">
+      <div class="image-container">
+        <img :src="imageUrl ? imageUrl : NoImage" :alt="name" class="card-image" />
+        <div class="gradient-overlay"></div>
+        <div class="type-badge" v-if="type">
+          {{ type === 'attractions' ? '관광지' : '캠핑장' }}
+        </div>
+      </div>
+      <div class="content-wrapper">
+        <div class="card-content">
+          <h3 class="card-title">{{ name }}</h3>
+          <p class="card-address">
+            <span class="location-icon">📍</span>
+            {{ detailAddress }}
+          </p>
+          <p v-if="introduction" class="card-intro">{{ introduction }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -29,14 +39,13 @@ const props = defineProps({
 const router = useRouter();
 
 function goToDetail() {
-  const routeName = props.type === 'attractions' ? 'AttractionDetailPage' : 'CampsiteDetailPage';
+  const routeName = props.type === 'attractions'
+    ? 'AttractionDetailPage'
+    : 'CampsiteDetailPage';
 
   router.push({
     name: routeName,
-    params: {
-      id: props.id.toString()
-    },
-
+    params: { id: props.id.toString() },
     query: {
       name: props.name,
       detailAddress: props.detailAddress,
@@ -49,21 +58,56 @@ function goToDetail() {
 
 <style scoped>
 .card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  transition: transform 0.2s;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: white;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 6px 15px #0076b630 !important;
-  transition: box-shadow 0.3s ease-in-out !important;
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 118, 182, 0.25);
 }
 
-.image-wrapper {
-  height: 50%;
+.card:hover .card-image {
+  transform: scale(1.1);
+}
+
+.card:hover .gradient-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.95) 60%,
+    rgba(255, 255, 255, 1) 80%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  transform: scale(1.1);
+}
+
+.card:hover .content-wrapper {
+  transform: translateY(-4px);
+}
+
+.card:hover .card-title {
+  color: #1a365d;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -71,22 +115,87 @@ function goToDetail() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  align-self: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.9) 60%,
+    rgba(255, 255, 255, 0.95) 80%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+.type-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #2c5282;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.content-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  z-index: 2;
+  transition: transform 0.4s ease;
 }
 
 .card-content {
-  padding: 20px;
+  color: #333333;
 }
 
-.card-content h3 {
-  font-weight: lighter;
-  margin: 0;
+.card-title {
   font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  word-break: keep-all;
+  line-height: 1.4;
+  color: #1a202c;
+  transition: color 0.3s ease;
 }
 
-.card-content p {
-  font-size: 0.6rem;
-  margin: 5px 0;
-  color: #666;
+.card-address {
+  font-size: 0.7rem;
+  margin: 0 0 8px 0;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #4a5568;
+  word-break: keep-all;
+  line-height: 1.3;
+}
+
+.location-icon {
+  font-size: 0.8rem;
+}
+
+.card-intro {
+  font-size: 0.65rem;
+  margin: 0;
+  color: #4a5568;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: keep-all;
+  line-height: 1.3;
 }
 </style>

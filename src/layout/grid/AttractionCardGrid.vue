@@ -145,6 +145,7 @@ span {
   justify-content: center;
   align-items: center;
   align-self: center;
+  font-size: 0.8rem;
 }
 
 .button {

@@ -1,13 +1,13 @@
 <!-- CampsiteCardGrid.vue -->
 <template>
-  <div class="grid-container">
-    <Card v-for="(camping, index) in campings" :key="index" v-bind="camping" />
-  </div>
-
   <div class="pagination">
     <ButtonLight class="button" @click="prevPage" :disabled="currentPage === 1" label="이전" />
     <span>Page {{ currentPage }} of {{ totalPages }}</span>
     <ButtonLight class="button" @click="nextPage" :disabled="currentPage === totalPages" label="다음" />
+  </div>
+
+  <div class="grid-container">
+    <Card v-for="(camping, index) in campings" :key="index" v-bind="camping" />
   </div>
 </template>
 
@@ -44,7 +44,7 @@ const prevPage = () => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
-  padding: 50px 100px;
+  padding: 25px 100px 50px;
 }
 
 .pagination {
@@ -52,6 +52,7 @@ const prevPage = () => {
   justify-content: center;
   align-items: center;
   align-self: center;
+  font-size: 0.8rem;
 }
 
 .button {
