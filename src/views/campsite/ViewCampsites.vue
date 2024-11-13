@@ -24,11 +24,11 @@
 
 <script setup>
 import { ref } from 'vue';
-import SearchBar from '@/components/SearchBar.vue';
-import SelectBox from '@/components/SelectBox.vue';
-import SingleTagFilter from '@/components/SingleTagFilter.vue';
-import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
-import ButtonDark from '@/components/ButtonDark.vue';
+import SearchBar from '@/components/search/SearchBar.vue';
+import SelectBox from '@/components/filter/SelectBox.vue';
+import SingleTagFilter from '@/components/filter/SingleTagFilter.vue';
+import CampsiteCardGrid from '@/layout/grid/CampsiteCardGrid.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
 
 // 상태 관리
 const searchQuery = ref('');

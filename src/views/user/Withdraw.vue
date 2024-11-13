@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import ButtonDark from "@/components/ButtonDark.vue";
+import ButtonDark from "@/components/button/ButtonDark.vue";
 </script>
 
 <style scoped>

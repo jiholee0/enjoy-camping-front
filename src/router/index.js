@@ -2,12 +2,12 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 // 컴포넌트 가져오기
-import Home from "@/views/HomePage.vue";
-import ViewCampsites from "@/views/ViewCampsites.vue";
-import ViewAttractions from "@/views/ViewAttractions.vue";
-import AttractionDetailPage from "@/views/AttractionDetailPage.vue";
-import CampsiteDetailPage from "@/views/CampsiteDetailPage.vue";
-import MyPage from "@/views/MyPage.vue";
+import Home from "@/views/main/HomePage.vue";
+import ViewCampsites from "@/views/campsite/ViewCampsites.vue";
+import ViewAttractions from "@/views/attraction/ViewAttractions.vue";
+import AttractionDetailPage from "@/views/attraction/AttractionDetailPage.vue";
+import CampsiteDetailPage from "@/views/campsite/CampsiteDetailPage.vue";
+import MyPage from "@/views/user/MyPage.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },

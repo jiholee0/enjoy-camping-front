@@ -24,11 +24,11 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import SearchBar from '@/components/SearchBar.vue';
-import SelectBox from '@/components/SelectBox.vue';
-import MultiTagFilter from '@/components/MultiTagFilter.vue';
-import AttractionCardGrid from '@/layout/AttractionCardGrid.vue';
-import ButtonDark from '@/components/ButtonDark.vue';
+import SearchBar from '@/components/search/SearchBar.vue';
+import SelectBox from '@/components/filter/SelectBox.vue';
+import MultiTagFilter from '@/components/filter/MultiTagFilter.vue';
+import AttractionCardGrid from '@/layout/grid/AttractionCardGrid.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
 
 // 검색어와 필터 상태 관리
 const searchQuery = ref('');

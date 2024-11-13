@@ -16,7 +16,7 @@
 
 <script setup>
 import { defineProps } from 'vue';
-import ReviewCard from '@/components/ReviewCard.vue';
+import ReviewCard from '@/components/card/ReviewCard.vue';
 
 defineProps({
   reviews: {

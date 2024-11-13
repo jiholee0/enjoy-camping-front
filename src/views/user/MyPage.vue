@@ -8,10 +8,10 @@
 
 <script setup>
 import { ref } from 'vue';
-import TabMenu from '@/components/TabMenu.vue';
-import PasswordChange from '@/layout/PasswordChange.vue';
-import ReviewList2 from '@/layout/ReviewCard2List.vue';
-import Withdraw from '@/layout/Withdraw.vue';
+import TabMenu from '@/components/tab/TabMenu.vue';
+import PasswordChange from '@/views/user/PasswordChange.vue';
+import ReviewList2 from '@/layout/list/ReviewCard2List.vue';
+import Withdraw from '@/views/user/Withdraw.vue';
 
 const userName = ref("홍승찬");
 const userEmail = ref("hsch19@gmail.com");

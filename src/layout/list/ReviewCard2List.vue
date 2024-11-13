@@ -17,8 +17,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import ReviewCard2 from '@/components/ReviewCard2.vue';
-import ButtonLight from '@/components/ButtonLight.vue';
+import ReviewCard2 from '@/components/card/ReviewCard2.vue';
+import ButtonLight from '@/components/button/ButtonLight.vue';
 
 const props = defineProps({
   reviews: {

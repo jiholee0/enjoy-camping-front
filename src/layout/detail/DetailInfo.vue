@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import ButtonDark from './ButtonDark.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
 import { defineProps } from 'vue';
 
 const props = defineProps({

@@ -36,10 +36,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import LoginModal from '@/views/LoginPage.vue';
-import SignupModal from '@/views/SignupPage.vue';
-import ButtonDark from '@/components/ButtonDark.vue';
-import ButtonLight from '@/components/ButtonLight.vue';
+import LoginModal from '@/views/user/LoginPage.vue';
+import SignupModal from '@/views/user/SignupPage.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
+import ButtonLight from '@/components/button/ButtonLight.vue';
 
 const isLoggedIn = ref(true);
 const isLoginModalOpen = ref(false);

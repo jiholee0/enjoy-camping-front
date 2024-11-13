@@ -4,7 +4,7 @@
       <img src="/images/CampingExampleImage.png" alt="캠핑장 이미지" class="background-image" />
       <DetailInfo
         :name="name"
-        :description=description
+        :description="description"
         :tel="tel || '010-0000-0000'"
         :address="address || '역삼 테헤란로 멀티캠퍼스'"
         :link="link || 'https://www.example.com'"
@@ -17,28 +17,49 @@
         <PlaceMap :latitude="37.499613" :longitude="127.036431" />
       </div>
     </div>
-    <TabMenu class="tab-menu" :tabs="tabs" />
+    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import DetailInfo from '@/components/DetailInfo.vue';
-import PlaceMap from '@/components/PlaceMap.vue';
-import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
-import TabMenu from '@/components/TabMenu.vue';
+import DetailInfo from '@/layout/detail/DetailInfo.vue';
+import PlaceMap from '@/components/map/PlaceMap.vue';
+import AttractionCardGrid from '@/layout/grid/AttractionCardGrid.vue';
+import TabMenu from '@/components/tab/TabMenu.vue';
+import ReviewCard2List from '@/layout/list/ReviewCard2List.vue';
 
+// 탭 및 리뷰 데이터 설정
 const tabs = ref([
-  { name: 'tourist', label: '주변 캠핑장', component: CampsiteCardGrid },
+  { name: 'tourist', label: '주변 관광지', component: AttractionCardGrid },
+  { name: 'camping', label: '캠핑장 리뷰', component: ReviewCard2List },
 ]);
 
+const reviewData = ref([
+  { id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
+  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
+  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+  // 더 많은 리뷰 데이터...
+]);
+
+// 라우터에서 전달된 query 데이터 가져오기
 const route = useRoute();
 
-const name = route.query.name;
-const address = route.query.address;
-const description = route.query.description;
-// const image = route.query.image;
+const name = ref(route.query.name || '기본 이름');
+const address = ref(route.query.address || '기본 주소');
+const description = ref(route.query.description || '기본 설명');
+const image = ref(route.query.image || '/images/CampingExampleImage.png');
+const tel = ref('010-0000-0000'); // 기본 전화번호 설정
+const link = ref('https://www.example.com'); // 기본 링크 설정
+
+// 데이터 업데이트 시점에 따라 reactivity 추가
+onMounted(() => {
+  name.value = route.query.name || name.value;
+  address.value = route.query.address || address.value;
+  description.value = route.query.description || description.value;
+  image.value = route.query.image || image.value;
+});
 </script>
 
 <style scoped>
@@ -89,7 +110,7 @@ const description = route.query.description;
   color: #333;
   padding-bottom: 20px;
   width: 100%;
-  align-self: left;
+  align-self: flex-start;
 }
 
 .map {

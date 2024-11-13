@@ -57,7 +57,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import ButtonDark from '@/components/ButtonDark.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
 
 const currentPassword = ref('');
 const newPassword = ref('');

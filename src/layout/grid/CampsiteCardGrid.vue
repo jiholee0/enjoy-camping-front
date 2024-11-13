@@ -13,9 +13,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import Card from '@/components/CardLight.vue';
+import Card from '@/components/card/CardLight.vue';
 import NoImage from '/images/NoImage.png';
-import ButtonLight from '@/components/ButtonLight.vue';
+import ButtonLight from '@/components/button/ButtonLight.vue';
 
 const values = [
   {

@@ -15,9 +15,9 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import CampsiteCardGrid from '@/layout/CampsiteCardGrid.vue';
-import ButtonDark from '@/components/ButtonDark.vue';
-import ImageSlider from '@/layout/ImageSlider.vue';
+import CampsiteCardGrid from '@/layout/grid/CampsiteCardGrid.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
+import ImageSlider from '@/layout/slider/ImageSlider.vue';
 
 const router = useRouter();
 

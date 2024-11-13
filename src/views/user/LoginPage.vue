@@ -29,8 +29,8 @@
 <script setup>
 import { ref } from 'vue';
 import { defineProps, defineEmits } from 'vue';
-import ButtonDark from '@/components/ButtonDark.vue';
-import ButtonLight from '@/components/ButtonLight.vue';
+import ButtonDark from '@/components/button/ButtonDark.vue';
+import ButtonLight from '@/components/button/ButtonLight.vue';
 
 defineProps({
   showModal: {
