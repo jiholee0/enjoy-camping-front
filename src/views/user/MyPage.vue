@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, markRaw } from 'vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
 import PasswordChange from '@/views/user/PasswordChange.vue';
 import ReviewList2 from '@/layout/list/ReviewCard2List.vue';
@@ -29,9 +29,9 @@ const reviewData = ref([
 ]);
 
 const tabs = ref([
-  { name: 'passwordChange', label: '비밀번호 수정', component: PasswordChange },
-  { name: 'reviewList2', label: '작성한 리뷰 보기', component: ReviewList2 },
-  { name: 'withdraw', label: '회원 탈퇴하기', component: Withdraw },
+  { name: 'passwordChange', label: '비밀번호 수정', component: markRaw(PasswordChange) },
+  { name: 'reviewList2', label: '작성한 리뷰 보기', component: markRaw(ReviewList2) },
+  { name: 'withdraw', label: '회원 탈퇴하기', component: markRaw(Withdraw) },
 ]);
 </script>
 
