@@ -7,6 +7,9 @@
         <div v-if="contentTypeName" class="type-badge">
           {{ contentTypeName }}
         </div>
+        <div v-if="distance" class="distance-badge">
+          {{ roundedDistance }} km
+        </div>
       </div>
       <div class="content-wrapper">
         <div class="card-content">
@@ -23,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import NoImage from '/images/NoImage.png';
@@ -37,6 +40,11 @@ const props = defineProps({
   firstImage1: String,
   no: Number,
   contentTypeId: Number,
+  distance: Number,
+});
+
+const roundedDistance = computed(() => {
+  return props.distance ? Math.round(props.distance * 10) / 10 : null;
 });
 
 const router = useRouter();
@@ -223,5 +231,19 @@ const handleImageError = (event) => {
   overflow: hidden;
   word-break: keep-all;
   line-height: 1.3;
+}
+
+.distance-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  background-color: rgba(66, 153, 225, 0.9); /* 파란색 배경 */
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 3;
 }
 </style>
