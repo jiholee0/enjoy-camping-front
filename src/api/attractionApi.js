@@ -12,7 +12,6 @@ export const getAttractions = ({
   order,
   sort
 }) => {
-  // 기본 params 설정
   const params = {
     keyword,
     sido,
@@ -23,7 +22,6 @@ export const getAttractions = ({
     sort,
   };
 
-  // contentTypes 배열을 개별 contentType 파라미터로 추가
 if (contentTypes) {
   params['contentType'] = contentTypes;
 }
@@ -36,9 +34,14 @@ return apiClient.get('/attractions', {
 });
 };
 
-
 export const getAttractionDetail = (index) => {
   return apiClient.get(`/attractions/${index}`, {
     params: {},
   });
 };
+
+export const getNearByCampsite = (index, pageNo, pageCnt, order, sort) => {
+  return apiClient.get(`/attractions/campings/${index}`, {
+    params: { pageNo, pageCnt, order, sort },
+  });
+}

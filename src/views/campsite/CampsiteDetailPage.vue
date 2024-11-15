@@ -22,12 +22,15 @@
         <PlaceMap :latitude="latitude" :longitude="longitude" />
       </div>
     </div>
-    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
+    <TabMenu
+    class="tab-menu"
+    :tabs="tabs"
+    @change-page="handlePageChange"/>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, markRaw, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import DetailInfo from '@/layout/detail/DetailInfo.vue';
 import PlaceMap from '@/components/map/PlaceMap.vue';
@@ -35,22 +38,10 @@ import AttractionCardGrid from '@/layout/grid/AttractionCardGrid.vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
 import ReviewCard2List from '@/layout/list/ReviewCard2List.vue';
 import { getCampsiteDetail } from '@/api/campsiteApi';
+import { getNearByCampsite } from '@/api/attractionApi';
 
-// 탭 및 리뷰 데이터 설정
-const tabs = ref([
-  { name: 'tourist', label: '주변 관광지', component: AttractionCardGrid },
-  { name: 'camping', label: '캠핑장 리뷰', component: ReviewCard2List },
-]);
-
-const reviewData = ref([
-  { id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  // 더 많은 리뷰 데이터...
-]);
-
-// 라우터에서 전달된 query 데이터 가져오기
-const route = useRoute();
+// tabs 배열 초기화
+const tabs = ref([]);
 
 // 상태 변수 정의
 const name = ref('');
@@ -61,6 +52,50 @@ const link = ref('');
 const image = ref('');
 const latitude = ref(0); // 기본값 설정
 const longitude = ref(0); // 기본값 설정
+
+const nearbyCampsite = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = 9;
+const totalItems = ref(0);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+const order = ref('distance');
+const sort = ref('asc');
+
+const reviewData = ref([
+  { id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
+  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
+  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
+  // 더 많은 리뷰 데이터...
+]);
+
+watch(
+  [nearbyCampsite, currentPage, totalPages],
+  () => {
+    tabs.value = [
+      {
+        name: 'attractions',
+        label: '주변 관광지',
+        component: markRaw(AttractionCardGrid),
+        props: {
+          attractions: nearbyCampsite.value, // 주변 캠핑장 데이터
+          totalPages: totalPages.value,
+          currentPage: currentPage.value, // 현재 페이지 번호
+        },
+      },
+      {
+        name: 'reviews',
+        label: '캠핑장 리뷰',
+        component: markRaw(ReviewCard2List),
+        props: {
+          reviews: reviewData.value,
+        },
+      },
+    ];
+  },
+  { immediate: true, deep: true }
+);
+
+const route = useRoute();
 
 // 데이터 업데이트 시점에 따라 reactivity 추가
 onMounted(async() => {
@@ -78,15 +113,44 @@ onMounted(async() => {
     image.value = data.imageUrl || '';
     latitude.value = data.latitude || 0;
     longitude.value = data.longitude || 0;
+
+    await fetchNearByCampsite(id);
   } catch (error) {
     console.error('Failed to fetch detail data:', error);
   }
 });
 
+// 주변 관광지 데이터를 가져오는 함수
+const fetchNearByCampsite = async (id) => {
+  try {
+    const response = await getNearByCampsite(
+      id,
+      currentPage.value,
+      itemsPerPage,
+      order.value,
+      sort.value
+    );
+    nearbyCampsite.value = response.data.result || [];
+    totalItems.value = response.data.totalCount || 0;
+  } catch (error) {
+    console.error('Failed to fetch nearby campsites:', error);
+    nearbyCampsite.value = [];
+    throw error;
+  }
+};
+
 // 이미지 에러 핸들러
 const handleImageError = (event) => {
   image.value = '';
   event.target.src = '';
+};
+
+// 페이지 변경 핸들러
+const handlePageChange = (newPage) => {
+  if (newPage !== currentPage.value) {
+    currentPage.value = newPage;
+    fetchNearByCampsite(route.params.id); // 페이지 변경 시 데이터 다시 가져오기
+  }
 };
 </script>
 

@@ -59,10 +59,18 @@ function openLink() {
 }
 
 .p1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   margin: 4px 0;
   color: #454545;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   padding-bottom: 10px;
+  line-height: 1.5rem;
+  max-height: calc(1.5rem * 2);
+  overflow: hidden;
+  word-break: keep-all;
+  width: 80%;
 }
 
 .p2 {

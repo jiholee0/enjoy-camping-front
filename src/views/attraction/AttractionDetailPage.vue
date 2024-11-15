@@ -22,24 +22,26 @@
         <PlaceMap :latitude="latitude" :longitude="longitude" />
       </div>
     </div>
-    <TabMenu class="tab-menu" :tabs="tabs" />
+    <TabMenu
+      class="tab-menu"
+      :tabs="tabs"
+      @change-page="handlePageChange"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, markRaw, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import DetailInfo from '@/layout/detail/DetailInfo.vue';
 import PlaceMap from '@/components/map/PlaceMap.vue';
 import CampsiteCardGrid from '@/layout/grid/CampsiteCardGrid.vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
 import { getAttractionDetail } from '@/api/attractionApi';
+import { getNearByAttraction } from '@/api/campsiteApi';
 
-const tabs = ref([
-  { name: 'tourist', label: '주변 캠핑장', component: CampsiteCardGrid },
-]);
-
-const route = useRoute();
+// tabs 배열 초기화
+const tabs = ref([]);
 
 // 상태 변수 정의
 const title = ref('');
@@ -48,9 +50,39 @@ const overview = ref('');
 const tel = ref('');
 const homepage = ref('');
 const image = ref('');
-const latitude = ref(37.499613); // 기본값 설정
-const longitude = ref(127.036431); // 기본값 설정
+const latitude = ref(0);
+const longitude = ref(0);
 
+const nearbyAttraction = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = 9;
+const totalItems = ref(0);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+const order = ref('distance');
+const sort = ref('asc');
+
+watch(
+  [nearbyAttraction, currentPage, totalPages],
+  () => {
+    tabs.value = [
+      {
+        name: 'campsites',
+        label: '주변 캠핑장',
+        component: markRaw(CampsiteCardGrid),
+        props: {
+          campings: nearbyAttraction.value, // 주변 캠핑장 데이터
+          totalPages: totalPages.value,
+          currentPage: currentPage.value, // 현재 페이지 번호
+        },
+      },
+    ];
+  },
+  { immediate: true, deep: true }
+);
+
+const route = useRoute();
+
+// 데이터 업데이트 시점에 따라 reactivity 추가
 onMounted(async () => {
   try {
     const id = route.params.id; // 경로에서 id 가져오기
@@ -59,22 +91,51 @@ onMounted(async () => {
 
     // 응답 데이터를 상태 변수에 설정
     title.value = data.title || '';
-    address.value = data.addr1 + data.addr2 || '';
+    address.value = (data.addr1 + (data.addr2 || '')).trim() || '';
     overview.value = data.overview || '';
     tel.value = data.tel || '';
     homepage.value = data.homepage || '';
     image.value = data.firstImage1 || data.firstImage2 || '';
     latitude.value = data.latitude || 0;
     longitude.value = data.longitude || 0;
+
+    await fetchNearByAttraction(id);
   } catch (error) {
-    console.error('Failed to fetch detail data:', error);
+    console.error('Failed to fetch data:', error);
   }
 });
+
+// 주변 캠핑장 데이터를 가져오는 함수
+const fetchNearByAttraction = async (id) => {
+  try {
+    const response = await getNearByAttraction(
+      id,
+      currentPage.value,
+      itemsPerPage,
+      order.value,
+      sort.value
+    );
+    nearbyAttraction.value = response.data.result || [];
+    totalItems.value = response.data.totalCount || 0;
+  } catch (error) {
+    console.error('Failed to fetch nearby campsites:', error);
+    nearbyAttraction.value = [];
+    throw error;
+  }
+};
 
 // 이미지 에러 핸들러
 const handleImageError = (event) => {
   image.value = '';
   event.target.src = '';
+};
+
+// 페이지 변경 핸들러
+const handlePageChange = (newPage) => {
+  if (newPage !== currentPage.value) {
+    currentPage.value = newPage;
+    fetchNearByAttraction(route.params.id); // 페이지 변경 시 데이터 다시 가져오기
+  }
 };
 </script>
 

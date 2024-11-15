@@ -2,18 +2,15 @@
   <div class="tab-menu">
     <!-- 탭 메뉴 버튼들 -->
     <div class="tabs">
-      <button
-        v-for="tab in tabs"
-        :key="tab.name"
-        :class="{ active: activeTab === tab.name }"
-        @click="selectTab(tab.name)"
-      >
+      <button v-for="tab in tabs" :key="tab.name" :class="{ active: activeTab === tab.name }"
+        @click="selectTab(tab.name)">
         {{ tab.label }}
       </button>
     </div>
     <!-- 선택된 탭에 해당하는 구성 요소 렌더링 -->
     <div class="tab-content">
-      <component :is="activeComponent" :reviews="reviews" />
+      <component v-if="activeComponent" :is="activeComponent" v-bind="activeTabProps" @change-page="handlePageChange" />
+      <p v-else>구성 요소를 불러올 수 없습니다.</p>
     </div>
   </div>
 </template>
@@ -26,12 +23,9 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  reviewData: {
-    type: Array,
-    required: false,
-    default: () => [],
-  },
 });
+
+const emit = defineEmits(['change-page']); // 부모로 이벤트 전달
 
 const activeTab = ref(props.tabs[0]?.name || ""); // 첫 번째 탭을 기본 활성 탭으로 설정
 
@@ -39,13 +33,15 @@ const selectTab = (tabName) => {
   activeTab.value = tabName;
 };
 
-const activeComponent = computed(() => {
-  const activeTabData = props.tabs.find((tab) => tab.name === activeTab.value);
-  return activeTabData ? activeTabData.component : null;
-});
+const activeTabData = computed(() => props.tabs.find((tab) => tab.name === activeTab.value));
 
-// reviewData 이름을 reviews로 변경하여 반환
-const reviews = props.reviewData;
+const activeComponent = computed(() => activeTabData.value?.component || null);
+
+const activeTabProps = computed(() => activeTabData.value?.props || {});
+
+const handlePageChange = (newPage) => {
+  emit('change-page', newPage);
+};
 </script>
 
 <style scoped>
