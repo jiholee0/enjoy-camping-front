@@ -1,7 +1,12 @@
 <template>
   <div class="detail-page">
     <div class="image-container">
-      <img v-if="image" :src="image" alt="관광지 이미지" class="background-image" />
+      <template v-if="image">
+        <img :src="image" alt="관광지 이미지" class="background-image" @error="handleImageError"/>
+        <div class="gradient-overlay"></div>
+      </template>
+      <div v-else class="no-image-container"></div>
+
       <DetailInfo
         :name="title"
         :description="overview"
@@ -11,7 +16,7 @@
         class="detail-info-overlay"
       />
     </div>
-    <div class="map-container">
+    <div class="map-container" v-if="latitude !== 0 && longitude !== 0">
       <div class="map-title">위치 정보</div>
       <div class="map">
         <PlaceMap :latitude="latitude" :longitude="longitude" />
@@ -65,6 +70,12 @@ onMounted(async () => {
     console.error('Failed to fetch detail data:', error);
   }
 });
+
+// 이미지 에러 핸들러
+const handleImageError = (event) => {
+  image.value = '';
+  event.target.src = '';
+};
 </script>
 
 <style scoped>
@@ -87,17 +98,54 @@ onMounted(async () => {
 
 .background-image {
   width: 90%;
-  height: auto;
+  height: 100%;
   max-width: 1000px;
   object-fit: cover;
-  object-position: center;
+}
+
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+}
+
+.no-image-container {
+  height: 0;
 }
 
 .detail-info-overlay {
   position: absolute;
+  bottom: 0;
   width: 90%;
   max-width: 1000px;
-  height: 50%;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 40%,
+    rgba(255, 255, 255, 0.6) 80%,
+    transparent 100%
+  );
+}
+
+.image-container.no-image {
+  height: 200px;
+}
+
+.image-container.no-image .detail-info-overlay {
+  position: relative;
+  bottom: auto;
+  margin-top: 20px;
+  padding: 0 !important;
 }
 
 .map-container {
@@ -115,7 +163,7 @@ onMounted(async () => {
   color: #333;
   padding-bottom: 20px;
   width: 100%;
-  align-self: left;
+  align-self: flex-start;
 }
 
 .map {

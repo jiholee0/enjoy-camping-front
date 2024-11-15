@@ -26,6 +26,8 @@ import Footer from "@/layout/structure/AppFooter.vue";
 .main-content {
   margin: 0 auto;
   padding: 70px !important;
+  flex: 1;
+  min-height: 80vh;
 }
 
 #app {
@@ -36,6 +38,7 @@ import Footer from "@/layout/structure/AppFooter.vue";
 body {
     font-family: "Noto Sans KR", sans-serif;
     min-width: 1000px;
+    height: 100%;
 }
 
 a {

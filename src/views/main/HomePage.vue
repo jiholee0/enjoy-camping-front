@@ -17,7 +17,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getCampings } from '@/api/campsiteApi.js';
+import { getCampsites } from '@/api/campsiteApi.js';
 import CampsiteCardGrid from '@/layout/grid/CampsiteCardGrid.vue';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ImageSlider from '@/layout/slider/ImageSlider.vue';
@@ -34,11 +34,14 @@ const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 const fetchCampings = async (page = 1) => {
   currentPage.value = page;
   try {
-    const response = await getCampings(page, itemsPerPage, 'name', 'asc');
+    const response = await getCampsites({
+      pageNo: page,
+      pageCnt: itemsPerPage,
+      order: 'id',
+      sort: 'asc'
+  });
     campings.value = response.data.result;
     totalItems.value = response.data.totalCount;
-
-    console.log(campings.value);
   } catch (error) {
     console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);
   }

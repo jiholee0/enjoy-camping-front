@@ -24,6 +24,7 @@
 
 <style scoped>
 .footer {
+  flex-shrink: 0;  /* footer가 줄어들지 않도록 설정 */
   position: relative;
   bottom: 0;
   left: 0;

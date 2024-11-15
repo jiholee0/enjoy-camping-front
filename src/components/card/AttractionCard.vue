@@ -4,7 +4,7 @@
       <div class="image-container">
         <img :src="firstImage1 ? firstImage1 : NoImage" :alt="title" class="card-image" @error="handleImageError"/>
         <div class="gradient-overlay"></div>
-        <div class="type-badge">
+        <div v-if="contentTypeName" class="type-badge">
           {{ contentTypeName }}
         </div>
       </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import NoImage from '/images/NoImage.png';
@@ -36,20 +36,37 @@ const props = defineProps({
   overview: String,
   firstImage1: String,
   no: Number,
-  contentTypeId: Number
+  contentTypeId: Number,
 });
 
 const router = useRouter();
-const contentTypeName = ref(''); // 초기값은 빈 문자열로 설정
+const contentTypeName = ref('');
 
-onMounted(async () => {
+// contentTypeId가 변경될 때마다 데이터를 새로 가져오는 함수
+const fetchContentTypeName = async () => {
+  if (!props.contentTypeId) return;
+
   try {
     const response = await getContentType(props.contentTypeId);
-    contentTypeName.value = response.data.result.name;
+    if (response.data?.result?.name) {
+      contentTypeName.value = response.data.result.name;
+    }
   } catch (error) {
     console.error('Failed to fetch content type name:', error);
-    contentTypeName.value = '관광지'; // 오류 시 기본값 설정
+    contentTypeName.value = '';
   }
+};
+
+// props.contentTypeId 변경 감지
+watch(() => props.contentTypeId, async (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    await fetchContentTypeName();
+  }
+}, { immediate: true });
+
+// 컴포넌트 마운트 시에도 데이터 가져오기
+onMounted(() => {
+  fetchContentTypeName();
 });
 
 function goToDetail() {
@@ -60,12 +77,10 @@ function goToDetail() {
   });
 }
 
-// 이미지 에러 핸들러
 const handleImageError = (event) => {
-  event.target.src = NoImage; // 이미지 로드 실패 시 대체 이미지로 설정
+  event.target.src = NoImage;
 };
 </script>
-
 
 <style scoped>
 .card {

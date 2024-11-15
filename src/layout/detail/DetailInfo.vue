@@ -54,21 +54,21 @@ function openLink() {
 
 .h2 {
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   margin: 0;
 }
 
 .p1 {
   margin: 4px 0;
   color: #454545;
-  font-size: 1.0rem;
+  font-size: 1.3rem;
   padding-bottom: 10px;
 }
 
 .p2 {
   margin: 4px 0;
   color: #454545;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
 }
 
 .website-button {

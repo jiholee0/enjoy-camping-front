@@ -143,7 +143,8 @@ const handleImageError = (event) => {
   background: linear-gradient(
     to top,
     rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.9) 40%,
+    rgba(255, 255, 255, 0.6) 80%,
     transparent 100%
   );
 }

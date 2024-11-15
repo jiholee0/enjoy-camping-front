@@ -6,3 +6,9 @@ export const getContentType = (index) => {
     params: {},
   });
 };
+
+export const getContentTypes = () => {
+  return apiClient.get('/contenttypes', {
+    params: {},
+  });
+}

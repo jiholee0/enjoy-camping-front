@@ -28,19 +28,19 @@
     </div>
     <span
       v-for="tag in tags"
-      :key="tag"
+      :key="tag.value"
       class="tag"
-      :class="{ 'tag-selected': selectedTags.includes(tag) }"
-      @click="toggleTag(tag)"
+      :class="{ 'tag-selected': selectedTags.includes(tag.value) }"
+      @click="toggleTag(tag.value)"
     >
-      <span v-if="selectedTags.includes(tag)" class="check-icon">✓</span>
-      {{ tag }}
+      <span v-if="selectedTags.includes(tag.value)" class="check-icon">✓</span>
+      {{ tag.label }}
     </span>
   </div>
 </template>
 
 <script setup>
-import { defineProps, ref, watch } from 'vue';
+import { defineProps, ref, watch, defineEmits } from 'vue';
 
 const props = defineProps({
   tags: {
@@ -49,28 +49,32 @@ const props = defineProps({
   },
 });
 
-const selectedTags = ref([...props.tags]);
+const emit = defineEmits(['update:modelValue']); // v-model을 위한 emit 함수
+
+const selectedTags = ref(props.tags.map(tag => tag.value)); // 기본적으로 모든 태그 선택
 const selectAll = ref(true);
 
 function toggleSelectAll() {
   if (selectAll.value) {
-    selectedTags.value = [...props.tags];
+    selectedTags.value = props.tags.map(tag => tag.value);
   } else {
     selectedTags.value = [];
   }
+  emit('update:modelValue', selectedTags.value); // 부모 컴포넌트로 전달
 }
 
-function toggleTag(tag) {
-  if (selectedTags.value.includes(tag)) {
-    selectedTags.value = selectedTags.value.filter(t => t !== tag);
+function toggleTag(value) {
+  if (selectedTags.value.includes(value)) {
+    selectedTags.value = selectedTags.value.filter(t => t !== value);
   } else {
-    selectedTags.value.push(tag);
+    selectedTags.value.push(value);
   }
   selectAll.value = selectedTags.value.length === props.tags.length;
+  emit('update:modelValue', selectedTags.value); // 부모 컴포넌트로 전달
 }
 
 watch(() => props.tags, (newTags) => {
-  selectedTags.value = [...newTags];
+  selectedTags.value = newTags.map(tag => tag.value);
   selectAll.value = true;
 });
 </script>

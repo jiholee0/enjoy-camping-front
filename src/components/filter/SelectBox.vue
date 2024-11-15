@@ -1,10 +1,11 @@
 <template>
-  <select class="select-box">
-    <option value="" disabled selected hidden>{{ placeholder }}</option>
+  <select class="select-box" @change="onChange" :value="modelValue">
+    <option value="" :selected="!modelValue">{{ placeholder }}</option>
     <option
       v-for="option in options"
       :key="option.value"
       :value="option.value"
+      :selected="option.value === modelValue"
     >
       {{ option.label }}
     </option>
@@ -12,9 +13,13 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: '',
+  },
   options: {
     type: Array,
     required: true,
@@ -22,9 +27,15 @@ defineProps({
   },
   placeholder: {
     type: String,
-    default: 'Sort by',
+    default: '선택하세요',
   },
 });
+
+const emit = defineEmits(['update:modelValue']);
+
+const onChange = (event) => {
+  emit('update:modelValue', event.target.value);
+};
 </script>
 
 <style scoped>

@@ -1,29 +1,36 @@
+<!-- SearchBar.vue -->
 <template>
   <div class="search-bar-container">
     <input
       type="text"
       :placeholder="label"
       class="search-bar"
-      v-model="searchText"
+      :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
+      @keyup.enter="$emit('search')"
     />
-    <span v-if="searchText" class="clear-icon" @click="clearSearch">×</span>
+    <span v-if="modelValue" class="clear-icon" @click="clearSearch">×</span>
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 defineProps({
   label: {
     type: String,
     default: '검색어를 입력하세요.',
   },
+  modelValue: {
+    type: String,
+    default: '',
+  },
 });
 
-const searchText = ref('');
+const emit = defineEmits(['update:modelValue', 'search']);  // search 이벤트 추가
 
 const clearSearch = () => {
-  searchText.value = '';
+  emit('update:modelValue', '');
 };
 </script>
 
