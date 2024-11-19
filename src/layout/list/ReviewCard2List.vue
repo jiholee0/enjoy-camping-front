@@ -24,6 +24,7 @@ const props = defineProps({
   reviews: {
     type: Array,
     required: true,
+    default: () => [],
   },
 });
 

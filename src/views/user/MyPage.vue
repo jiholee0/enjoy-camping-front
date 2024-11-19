@@ -2,7 +2,7 @@
   <div class="my-page">
     <h1>{{ userName }}</h1>
     <p>{{ userEmail }}</p>
-    <TabMenu class="tab-menu" :tabs="tabs" :reviewData="reviewData" />
+    <TabMenu class="tab-menu" :tabs="tabs" />
   </div>
 </template>
 
@@ -30,7 +30,14 @@ const reviewData = ref([
 
 const tabs = ref([
   { name: 'passwordChange', label: '비밀번호 수정', component: markRaw(PasswordChange) },
-  { name: 'reviewList2', label: '작성한 리뷰 보기', component: markRaw(ReviewList2) },
+  {
+    name: 'reviewList2',
+    label: '작성한 리뷰 보기',
+    component: markRaw(ReviewList2),
+    props: {
+          reviews: reviewData.value,
+      },
+   },
   { name: 'withdraw', label: '회원 탈퇴하기', component: markRaw(Withdraw) },
 ]);
 </script>
