@@ -50,14 +50,18 @@
         </div>
       </div>
 
-      <ButtonDark type="submit" class="submit-button" label="비밀번호 수정" />
+      <ButtonDark type="submit" class="submit-button" :disabled="!isValidForm" label="비밀번호 수정" />
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
+import Swal from 'sweetalert2';
+
+const router = useRouter();
 
 const currentPassword = ref('');
 const newPassword = ref('');
@@ -67,6 +71,16 @@ const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
 const passwordError = ref('');
 const confirmPasswordError = ref('');
+
+const isValidForm = computed(() => {
+  return (
+    currentPassword.value &&
+    newPassword.value &&
+    confirmPassword.value &&
+    !passwordError.value &&
+    !confirmPasswordError.value
+  );
+});
 
 const toggleShowCurrentPassword = () => {
   showCurrentPassword.value = !showCurrentPassword.value;
@@ -81,7 +95,7 @@ const toggleShowConfirmPassword = () => {
 };
 
 const validatePassword = () => {
-  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-=])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;?><,./-=]{6,}$/;
+  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./\-=\]])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;?><,./\-=\]]{6,}$/;
   passwordError.value = passwordPattern.test(newPassword.value)
     ? ''
     : '비밀번호는 6자 이상이어야 하며, 특수문자, 영어, 숫자를 포함해야 합니다.';
@@ -99,7 +113,26 @@ const handlePasswordChange = () => {
   validatePassword();
   validateConfirmPassword();
 
-  alert('비밀번호가 성공적으로 변경되었습니다.');
+  if (isValidForm.value) {
+    Swal.fire({
+      title: '비밀번호 변경 완료',
+      text: '비밀번호가 성공적으로 변경되었습니다.',
+      icon: 'success',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#0077b6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push('/');
+      }
+    });
+  } else {
+    Swal.fire({
+      title: '오류',
+      text: '모든 필드를 올바르게 입력해 주세요.',
+      icon: 'error',
+      confirmButtonText: '확인',
+    });
+  }
 };
 </script>
 
@@ -163,6 +196,11 @@ input {
 .eye-icon {
   width: 20px;
   height: 20px;
+}
+
+.submit-button:disabled {
+  background-color: #81c3d7;
+  cursor: not-allowed;
 }
 
 </style>

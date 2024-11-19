@@ -35,8 +35,8 @@ const tabs = ref([
     label: '작성한 리뷰 보기',
     component: markRaw(ReviewList2),
     props: {
-          reviews: reviewData.value,
-      },
+      reviews: reviewData.value,
+    },
    },
   { name: 'withdraw', label: '회원 탈퇴하기', component: markRaw(Withdraw) },
 ]);

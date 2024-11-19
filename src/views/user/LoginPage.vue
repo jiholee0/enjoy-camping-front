@@ -29,8 +29,12 @@
 <script setup>
 import { ref } from 'vue';
 import { defineProps, defineEmits } from 'vue';
+import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
+import Swal from 'sweetalert2';
+
+const router = useRouter();
 
 defineProps({
   showModal: {
@@ -56,13 +60,26 @@ const onAnimationEnd = () => {
 };
 
 const handleLogin = () => {
+
+  Swal.fire({
+    title: '로그인 완료',
+    text: '로그인이 성공적으로 완료되었습니다.',
+    icon: 'success',
+    confirmButtonText: '확인',
+    confirmButtonColor: '#0077b6',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.push('/');
+    }
+  });
+
   console.log("Email:", email.value);
   console.log("Password:", password.value);
   startCloseModal();
 };
 
 const forgotPassword = () => {
-  alert("비밀번호 찾기 기능을 구현하세요.");
+  // alert("비밀번호 찾기 기능을 구현하세요.");
 };
 </script>
 

@@ -40,6 +40,7 @@ import LoginModal from '@/views/user/LoginPage.vue';
 import SignupModal from '@/views/user/SignupPage.vue';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
+import Swal from 'sweetalert2';
 
 const isLoggedIn = ref(true);
 const isLoginModalOpen = ref(false);
@@ -58,6 +59,18 @@ const signup = () => {
 
 const logout = () => {
   isLoggedIn.value = false;
+
+  Swal.fire({
+    title: '로그아웃 완료',
+    text: '로그아웃이 성공적으로 완료되었습니다.',
+    icon: 'success',
+    confirmButtonText: '확인',
+    confirmButtonColor: '#0077b6',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.push('/');
+    }
+  });
 };
 
 const goToMyPage = () => {

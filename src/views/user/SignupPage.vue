@@ -74,7 +74,7 @@
           </button>
         </div>
         <div class="form-actions">
-          <ButtonDark label="회원가입" @submit.prevent="handleSignup" />
+          <ButtonDark class="join-button" :label="'회원가입'" :disabled="!isValidForm" @submit.prevent="handleSignup" />
         </div>
       </form>
     </div>
@@ -82,9 +82,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineProps, defineEmits } from 'vue';
+import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
+import Swal from 'sweetalert2';
+
+const router = useRouter();
 
 defineProps({
   showModal: {
@@ -106,6 +110,20 @@ const confirmPasswordError = ref('');
 const isClosing = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+
+// 모든 필드가 유효한지 확인하는 계산된 속성
+const isValidForm = computed(() => {
+  return (
+    name.value &&
+    email.value &&
+    password.value &&
+    confirmPassword.value &&
+    !nameError.value &&
+    !emailError.value &&
+    !passwordError.value &&
+    !confirmPasswordError.value
+  );
+});
 
 const startCloseModal = () => {
   isClosing.value = true;
@@ -138,7 +156,7 @@ const validateEmail = () => {
 };
 
 const validatePassword = () => {
-  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-=])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;?><,./-=]{6,}$/;
+  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./\-=\]])[A-Za-z\d!@#$%^&*()_+~`|}{[\]:;?><,./\-=\]]{6,}$/;
   passwordError.value = passwordPattern.test(password.value)
     ? ''
     : '비밀번호는 6자 이상이어야 하며, 특수문자, 영어, 숫자를 포함해야 합니다.';
@@ -158,13 +176,30 @@ const handleSignup = () => {
   validatePassword();
   validateConfirmPassword();
 
-  if (!nameError.value && !emailError.value && !passwordError.value && !confirmPasswordError.value) {
-    console.log("Name:", name.value);
-    console.log("Email:", email.value);
-    console.log("Password:", password.value);
-    startCloseModal();
+  if (isValidForm.value) {
+    Swal.fire({
+      title: '회원가입 완료',
+      text: '회원가입이 성공적으로 완료되었습니다.',
+      icon: 'success',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#0077b6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push('/');
+      }
+    });
+  } else {
+    Swal.fire({
+      title: 'ERROR!',
+      text: '회원가입에 실패하였습니다.',
+      icon: 'error',
+      confirmButtonText: '확인',
+    });
   }
+  startCloseModal();
 };
+
+
 </script>
 
 <style scoped>
@@ -275,4 +310,8 @@ const handleSignup = () => {
   margin-bottom: 0.5em;
 }
 
+.join-button:disabled {
+  background-color: #81c3d7;
+  cursor: not-allowed;
+}
 </style>

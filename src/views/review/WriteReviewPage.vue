@@ -115,14 +115,18 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { getCampsites } from '@/api/campsiteApi.js';
 import {  getSidos, getGuguns } from '@/api/sidogugunApi.js'
-import { getPresignedUrl, uploadImageToS3, submitReview } from '@/api/reviewApi.js';
+import { getPresignedUrl, uploadImageToS3 } from '@/api/reviewApi.js';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import TipTapEditor from '@/components/editor/TipTapEditor.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
+import Swal from 'sweetalert2';
+
+const router = useRouter();
 
 const searchQuery = ref('');
 const selectedRegion = ref('');
@@ -225,9 +229,20 @@ const submitReviewHandler = async () => {
       reviewImageList: uploadedImageUrls,
     };
 
-    console.log('리뷰 제출하기:', reviewData);
-    await submitReview(reviewData);
-    console.log('리뷰 제출 완료:', reviewData);
+    console.log('리뷰 : ', reviewData);
+    // await submitReview(reviewData);
+
+    Swal.fire({
+    title: '리뷰 제출 완료',
+    text: '리뷰가 성공적으로 제출되었습니다.',
+    icon: 'success',
+    confirmButtonText: '확인',
+    confirmButtonColor: '#0077b6',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.push('/'); // 리뷰보기 화면으로
+    }
+  });
   } catch (error) {
     console.error('리뷰 제출 과정에서 오류가 발생했습니다:', error);
   }
