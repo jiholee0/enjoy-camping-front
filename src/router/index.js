@@ -7,6 +7,7 @@ import ViewCampsites from "@/views/campsite/ViewCampsites.vue";
 import ViewAttractions from "@/views/attraction/ViewAttractions.vue";
 import AttractionDetailPage from "@/views/attraction/AttractionDetailPage.vue";
 import CampsiteDetailPage from "@/views/campsite/CampsiteDetailPage.vue";
+import WriteReviewPage from "@/views/review/WriteReviewPage.vue";
 import MyPage from "@/views/user/MyPage.vue";
 
 const routes = [
@@ -28,6 +29,11 @@ const routes = [
     name: "CampsiteDetailPage",
     component: CampsiteDetailPage,
     props: true,
+  },
+  {
+    path: "/writeReview",
+    name: "WriteReviewPage",
+    component: WriteReviewPage,
   },
   { path: "/myPage", name: "MyPage", component: MyPage },
 ];
