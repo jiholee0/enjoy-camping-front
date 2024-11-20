@@ -219,7 +219,6 @@ const handleBackButton = () => {
 const submitReviewHandler = async () => {
   if (!isValidForm.value) return;
   try {
-    const start = performance.now();
     // 1. 에디터 내용에서 HTML 가져오기
     let editorContent = reviewContent.value;
 
@@ -231,10 +230,6 @@ const submitReviewHandler = async () => {
     // 이미지 업로드를 병렬로 처리할 배열 준비
     const imageUploadPromises = [];
     const uploadedImageUrls = [];
-
-    // presigned URL 생성 시간과 S3 업로드 시간 측정을 위한 배열
-    const presignedUrlTimes = [];
-    const uploadImageToS3Times = [];
 
     // 모든 이미지에 대해 병렬 처리
     for (let i = 0; i < images.length; i++) {
@@ -249,16 +244,9 @@ const submitReviewHandler = async () => {
           const blob = await response.blob();
 
           // presigned URL 생성 시간 측정
-          const presignedUrlStart = performance.now();
           const presignedUrl = (await createPresignedUrl(fileName, blob.type)).data.result;
-          const presignedUrlEnd = performance.now();
-          presignedUrlTimes.push(presignedUrlEnd - presignedUrlStart);
 
-          // S3 업로드 시간 측정
-          const uploadImageToS3Start = performance.now();
           await uploadImageToS3(presignedUrl, blob);
-          const uploadImageToS3End = performance.now();
-          uploadImageToS3Times.push(uploadImageToS3End - uploadImageToS3Start);
 
           const s3Url = presignedUrl.split('?')[0];
           img.src = s3Url;
@@ -271,21 +259,10 @@ const submitReviewHandler = async () => {
       }
     }
 
-    // 모든 이미지 업로드 완료 대기
-    const uploadResults = await Promise.all(imageUploadPromises);
+    await Promise.all(imageUploadPromises);
 
-    // 성능 측정 결과 출력
-    const totalPresignedUrlTime = presignedUrlTimes.reduce((acc, time) => acc + time, 0);
-    const totalUploadTime = uploadImageToS3Times.reduce((acc, time) => acc + time, 0);
-
-    console.log(`병렬 처리된 이미지 개수: ${uploadResults.length}`);
-    console.log(`클라이언트-서버 pre-signed Url create 총 소요 시간: ${totalPresignedUrlTime.toFixed(2)} ms`);
-    console.log(`S3에 이미지 업로드 총 소요 시간: ${totalUploadTime.toFixed(2)} ms`);
-
-    // 3. 변환된 HTML 반영
     editorContent = tempDiv.innerHTML;
 
-    // 4. 리뷰 데이터 생성
     const reviewData = {
       campingId: selectedCampsite.value.id,
       title: reviewTitle.value,
@@ -293,16 +270,10 @@ const submitReviewHandler = async () => {
       imageUrls: uploadedImageUrls,
     };
 
-    // 5. 리뷰 제출 시간 측정
-    const submitReviewStart = performance.now();
-    await submitReview(reviewData);
-    const submitReviewEnd = performance.now();
-    console.log(`리뷰 POST 소요 시간: ${(submitReviewEnd - submitReviewStart).toFixed(2)} ms`);
+    const response = await submitReview(reviewData);
+    const newReview = response.data.result;
 
-    const end = performance.now();
-    console.log(`전체 리뷰 제출 소요 시간: ${(end - start).toFixed(2)} ms`);
 
-    // 6. 성공 메시지 및 페이지 이동
     Swal.fire({
       title: '리뷰 제출 완료',
       text: '리뷰가 성공적으로 제출되었습니다.',
@@ -311,7 +282,14 @@ const submitReviewHandler = async () => {
       confirmButtonColor: '#0077b6',
     }).then((result) => {
       if (result.isConfirmed) {
-        router.push(`./detail/campings/${reviewData.campingId}`);
+        // router.push(`./detail/campings/${reviewData.campingId}`);
+        router.push({
+        name: 'ViewReviewPage',
+        query: {
+          campsiteId: selectedCampsite.value.id,
+          reviewId: newReview.id,
+        },
+      });
       }
     });
   } catch (error) {

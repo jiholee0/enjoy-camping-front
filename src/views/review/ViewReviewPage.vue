@@ -138,7 +138,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { getCampsites } from '@/api/campsiteApi.js';
+import { getCampsites, getCampsiteDetail } from '@/api/campsiteApi.js';
 import { getReviewByCampsite } from '@/api/reviewApi.js'
 import { getSidos, getGuguns } from '@/api/sidogugunApi.js';
 import ButtonDark from '@/components/button/ButtonDark.vue';
@@ -224,6 +224,7 @@ const fetchCampings = async (page = 1) => {
     });
     campings.value = response.data.result;
     totalItems.value = response.data.totalCount;
+    currentPage.value = page;
   } catch (error) {
     console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);
   }
@@ -292,10 +293,33 @@ const prevPage = () => {
   }
 };
 
-onMounted(() => {
-  fetchRegionOptions();
-  fetchCampings();
+onMounted(async () => {
+  const { campsiteId, reviewId } = router.currentRoute.value.query;
+
+  if (campsiteId) {
+    try {
+      const campsiteDetail = (await getCampsiteDetail(campsiteId)).data.result;
+      campings.value = [campsiteDetail]; // 검색 결과를 해당 캠핑장으로 제한
+      totalItems.value = 1;
+      selectedCampsite.value = campsiteDetail;
+
+      const response = await getReviewByCampsite(campsiteId);
+      reviews.value = response.data.result;
+
+      if (reviewId) {
+        selectedReview.value = reviews.value.find(
+          (review) => review.id === parseInt(reviewId)
+        );
+      }
+    } catch (error) {
+      console.error("캠핑장 정보를 불러오는 중 오류가 발생했습니다:", error);
+    }
+  } else {
+    await fetchRegionOptions();
+    await fetchCampings();
+  }
 });
+
 </script>
 
 <style scoped>
