@@ -218,36 +218,69 @@ const handleBackButton = () => {
 
 const submitReviewHandler = async () => {
   if (!isValidForm.value) return;
-
   try {
+    const start = performance.now();
     // 1. 에디터 내용에서 HTML 가져오기
     let editorContent = reviewContent.value;
 
     // 2. HTML 파싱하여 이미지 태그의 src 속성 추출
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = editorContent;
-    const images = tempDiv.querySelectorAll('img');
+    const images = Array.from(tempDiv.querySelectorAll('img'));
 
-    // 업로드된 이미지 URL 수집
+    // 이미지 업로드를 병렬로 처리할 배열 준비
+    const imageUploadPromises = [];
     const uploadedImageUrls = [];
 
-    for (const img of images) {
+    // presigned URL 생성 시간과 S3 업로드 시간 측정을 위한 배열
+    const presignedUrlTimes = [];
+    const uploadImageToS3Times = [];
+
+    // 모든 이미지에 대해 병렬 처리
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i];
       const localSrc = img.src;
 
       if (localSrc.startsWith('blob:')) {
-        // S3 업로드
-        const fileName = `image_${Date.now()}`; // 고유 파일 이름 생성
-        const response = await fetch(localSrc); // 로컬 이미지 URL에서 파일 가져오기
-        const blob = await response.blob(); // Blob으로 변환
+        const uploadPromise = (async () => {
+          // S3 업로드 준비
+          const fileName = `image_${Date.now()}_${i}`; // 고유 파일 이름 생성
+          const response = await fetch(localSrc);
+          const blob = await response.blob();
 
-        const presignedUrl = (await createPresignedUrl(fileName, blob.type)).data.result;
-        await uploadImageToS3(presignedUrl, blob);
+          // presigned URL 생성 시간 측정
+          const presignedUrlStart = performance.now();
+          const presignedUrl = (await createPresignedUrl(fileName, blob.type)).data.result;
+          const presignedUrlEnd = performance.now();
+          presignedUrlTimes.push(presignedUrlEnd - presignedUrlStart);
 
-        const s3Url = presignedUrl.split('?')[0]; // S3 URL 추출
-        img.src = s3Url; // 에디터 HTML에 S3 URL 대체
-        uploadedImageUrls.push(s3Url); // 업로드된 이미지 URL 저장
+          // S3 업로드 시간 측정
+          const uploadImageToS3Start = performance.now();
+          await uploadImageToS3(presignedUrl, blob);
+          const uploadImageToS3End = performance.now();
+          uploadImageToS3Times.push(uploadImageToS3End - uploadImageToS3Start);
+
+          const s3Url = presignedUrl.split('?')[0];
+          img.src = s3Url;
+          uploadedImageUrls.push(s3Url);
+
+          return { index: i, s3Url };
+        })();
+
+        imageUploadPromises.push(uploadPromise);
       }
     }
+
+    // 모든 이미지 업로드 완료 대기
+    const uploadResults = await Promise.all(imageUploadPromises);
+
+    // 성능 측정 결과 출력
+    const totalPresignedUrlTime = presignedUrlTimes.reduce((acc, time) => acc + time, 0);
+    const totalUploadTime = uploadImageToS3Times.reduce((acc, time) => acc + time, 0);
+
+    console.log(`병렬 처리된 이미지 개수: ${uploadResults.length}`);
+    console.log(`클라이언트-서버 pre-signed Url create 총 소요 시간: ${totalPresignedUrlTime.toFixed(2)} ms`);
+    console.log(`S3에 이미지 업로드 총 소요 시간: ${totalUploadTime.toFixed(2)} ms`);
 
     // 3. 변환된 HTML 반영
     editorContent = tempDiv.innerHTML;
@@ -257,11 +290,17 @@ const submitReviewHandler = async () => {
       campingId: selectedCampsite.value.id,
       title: reviewTitle.value,
       content: editorContent,
-      imageUrls: uploadedImageUrls, // 업로드된 이미지 URL 포함
+      imageUrls: uploadedImageUrls,
     };
 
-    // 5. 서버로 리뷰 데이터 전송
+    // 5. 리뷰 제출 시간 측정
+    const submitReviewStart = performance.now();
     await submitReview(reviewData);
+    const submitReviewEnd = performance.now();
+    console.log(`리뷰 POST 소요 시간: ${(submitReviewEnd - submitReviewStart).toFixed(2)} ms`);
+
+    const end = performance.now();
+    console.log(`전체 리뷰 제출 소요 시간: ${(end - start).toFixed(2)} ms`);
 
     // 6. 성공 메시지 및 페이지 이동
     Swal.fire({
@@ -279,7 +318,6 @@ const submitReviewHandler = async () => {
     console.error('리뷰 제출 과정에서 오류가 발생했습니다:', error);
   }
 };
-
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
@@ -311,6 +349,8 @@ onMounted(() => {
   gap: 40px;
   position: relative;
   overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .section-left {
