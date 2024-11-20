@@ -16,6 +16,9 @@
         <li :class="{ active: isActive('/viewAttractions') }">
           <router-link to="/viewAttractions">관광지 둘러보기</router-link>
         </li>
+        <li :class="{ active: isActive('/viewReviews') }">
+          <router-link to="/viewReviews">리뷰 보기</router-link>
+        </li>
         <li :class="{ active: isActive('/writeReview') }">
           <router-link to="/writeReview">리뷰 쓰기</router-link>
         </li>

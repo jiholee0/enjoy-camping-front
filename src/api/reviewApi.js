@@ -1,10 +1,9 @@
 import apiClient from './axiosInstance';
 
-const getPresignedUrl = (fileName) => {
-  return apiClient.get(`/reviews/images/presignedUrl`, {
-    params: {
-      fileName: fileName,
-    },
+const createPresignedUrl = (fileName, contentType = "image/jpeg") => {
+  return apiClient.post(`/reviews/images/presignedUrl`, {
+    fileName,
+    contentType,
   });
 };
 
@@ -20,4 +19,12 @@ const submitReview = (reviewData) => {
   return apiClient.post(`/reviews`, reviewData);
 };
 
-export { getPresignedUrl, uploadImageToS3, submitReview };
+const getReviewDetail = (index) => {
+  return apiClient.get(`/reviews/${index}`);
+};
+
+const getReviewByCampsite = (index) => {
+  return apiClient.get(`/reviews/campings/${index}`);
+};
+
+export { createPresignedUrl, uploadImageToS3, submitReview, getReviewDetail, getReviewByCampsite };

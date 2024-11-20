@@ -1,14 +1,28 @@
 // src/api/sidogugunApi.js
 import apiClient from './axiosInstance';
 
-export const getSidos = () => {
+const getSidos = () => {
   return apiClient.get('/sidoguguns/sidos', {
     params: {}
   });
 };
 
-export const getGuguns = (sidoCode) => {
-  return apiClient.get(`/sidoguguns/guguns/${sidoCode}`, {
+const getGuguns = (sidoCode) => {
+  return apiClient.get(`/sidoguguns/sidos/${sidoCode}/guguns`, {
     params: {}
   });
 };
+
+const getSido = (index) => {
+  return apiClient.get(`/sidoguguns/sidos/${index}`, {
+    params: {}
+  });
+};
+
+const getGugun = (sidoCode, index) => {
+  return apiClient.get(`/sidoguguns/sidos/${sidoCode}/guguns/${index}`, {
+    params: {}
+  });
+};
+
+export {getSidos, getGuguns, getSido, getGugun};

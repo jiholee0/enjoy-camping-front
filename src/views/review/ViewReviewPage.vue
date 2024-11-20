@@ -1,0 +1,651 @@
+<template>
+  <div class="view-review">
+    <!-- 섹션 1: 캠핑장 검색 -->
+    <div v-if="!selectedReview" class="section search" :class="{ 'expanded': !selectedCampsite }" ref="searchSection">
+      <div class="header">
+        <h2>캠핑장 선택하기</h2>
+      </div>
+      <div class="filters-container">
+        <div class="select-group">
+          <SelectBox
+            :options="regionOptions"
+            placeholder="시/도 선택"
+            v-model="selectedRegion"
+            @update:modelValue="onRegionChange"
+          />
+          <SelectBox
+            :options="districtOptions"
+            placeholder="구/군 선택"
+            v-model="selectedDistrict"
+            :key="selectedRegion"
+          />
+        </div>
+        <div class="search-container">
+          <SearchBar
+            class="search-bar"
+            label="캠핑장 검색하기"
+            @search="onSearch"
+            v-model="searchQuery"
+          />
+          <ButtonDark
+            class="search-button"
+            @click.capture="onSearch"
+            label="검색"
+          />
+        </div>
+      </div>
+      <div class="campsite-list">
+        <div v-if="campings.length > 0" class="list-container">
+          <div
+            v-for="camping in campings"
+            :key="camping.id"
+            class="list-item"
+          >
+            <div class="list-item-content" @click="fetchReviewsForCampsite(camping)">
+              <div>
+                <h3>{{ camping.name }}</h3>
+                <p>{{ camping.detailAddress }}</p>
+              </div>
+              <button
+                class="info-button"
+                @click.stop="navigateToDetail(camping.id)"
+              >
+                <img src="/images/info-icon.png" alt="Info" />
+              </button>
+            </div>
+          </div>
+          <div class="pagination">
+            <ButtonLight
+              class="button"
+              @click.capture="prevPage"
+              :disabled="currentPage === 1"
+              label="이전"
+            />
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <ButtonLight
+              class="button"
+              @click.capture="nextPage"
+              :disabled="currentPage === totalPages"
+              label="다음"
+            />
+          </div>
+        </div>
+        <p v-else class="no-results">검색 결과가 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- 섹션 2: 리뷰 목록 -->
+    <div class="section reviews"
+         :class="{
+           'expanded': selectedCampsite && !selectedReview,
+           'left': selectedReview,
+         }">
+      <div v-if="selectedCampsite">
+        <ButtonLight
+          class="back-button"
+          @click="handleBackButton"
+          label="← 캠핑장 선택으로 돌아가기"
+        />
+        <div class="review-header">
+          <h2>{{ selectedCampsite.name }} 리뷰</h2>
+          <span class="review-count">총 {{ reviews.length }}개의 리뷰</span>
+        </div>
+        <div v-if="reviews.length > 0" class="reviews-container">
+          <div
+            v-for="review in reviews"
+            :key="review.id"
+            class="review-card"
+            @click="selectReview(review)"
+          >
+            <div class="review-card-header">
+              <h3 class="review-title">{{ review.title }}</h3>
+              <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+            </div>
+            <div class="review-card-content">
+              <div class="review-preview" v-html="truncateContent(review.content)"></div>
+            </div>
+          </div>
+        </div>
+        <p v-else class="no-results">작성된 리뷰가 없습니다.</p>
+      </div>
+      <div v-else class="placeholder">
+        <p>👈 왼쪽에서 캠핑장을 선택해주세요.</p>
+      </div>
+    </div>
+
+    <!-- 섹션 3: 리뷰 상세 -->
+    <div class="section detail"
+         :class="{
+           'expanded': selectedReview,
+         }">
+      <transition name="fade">
+        <div v-if="selectedReview" class="review-detail">
+          <ButtonLight
+            class="back-button"
+            @click="selectedReview = null"
+            label="← 리뷰 목록으로 돌아가기"
+          />
+          <h2>{{ selectedReview.title }}</h2>
+          <p>{{ formatDate(selectedReview.createdAt) }}</p>
+          <div class="review-content" v-html="selectedReview.content"></div>
+        </div>
+      </transition>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { getCampsites } from '@/api/campsiteApi.js';
+import { getReviewByCampsite } from '@/api/reviewApi.js'
+import { getSidos, getGuguns } from '@/api/sidogugunApi.js';
+import ButtonDark from '@/components/button/ButtonDark.vue';
+import ButtonLight from '@/components/button/ButtonLight.vue';
+import SearchBar from '@/components/search/SearchBar.vue';
+import SelectBox from '@/components/filter/SelectBox.vue';
+
+const searchQuery = ref('');
+const selectedRegion = ref('');
+const selectedDistrict = ref('');
+const regionOptions = ref([]);
+const districtOptions = ref([]);
+const campings = ref([]);
+const reviews = ref([]);
+const selectedCampsite = ref(null);
+const selectedReview = ref(null);
+
+const currentPage = ref(1);
+const itemsPerPage = 9;
+const totalItems = ref(0);
+
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(date);
+};
+
+const truncateContent = (content) => {
+  if (!content) return '';
+  // HTML 파싱
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, 'text/html');
+  const textContent = doc.body.textContent || '';
+
+  // 100자 제한 후 HTML 유지
+  const truncatedText = textContent.length > 100 ? textContent.substring(0, 100) + '...' : textContent;
+  return truncatedText;
+};
+
+const fetchRegionOptions = async () => {
+  try {
+    const response = await getSidos();
+    regionOptions.value = response.data.result.map(sido => ({
+      value: sido.sidoCode,
+      label: sido.sidoName,
+    }));
+  } catch (error) {
+    console.error("시/도 데이터를 불러오는 중 오류가 발생했습니다:", error);
+  }
+};
+
+const fetchDistrictOptions = async (sidoCode) => {
+  try {
+    const response = await getGuguns(sidoCode);
+    districtOptions.value = response.data.result.map(gugun => ({
+      value: gugun.gugunCode,
+      label: gugun.gugunName,
+    }));
+  } catch (error) {
+    console.error("구/군 데이터를 불러오는 중 오류가 발생했습니다:", error);
+  }
+};
+
+const fetchCampings = async (page = 1) => {
+  try {
+    const response = await getCampsites({
+      keyword: searchQuery.value,
+      sido: selectedRegion.value,
+      gugun: selectedDistrict.value,
+      pageNo: page,
+      pageCnt: itemsPerPage,
+    });
+    campings.value = response.data.result;
+    totalItems.value = response.data.totalCount;
+  } catch (error) {
+    console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);
+  }
+};
+
+const fetchReviewsForCampsite = async (camping) => {
+  selectedCampsite.value = camping
+  try {
+    const response = await getReviewByCampsite(camping.id);
+    reviews.value = response.data.result;
+  } catch (error) {
+    console.error("리뷰 데이터를 불러오는 중 오류가 발생했습니다:", error);
+  }
+};
+
+const onRegionChange = async (value) => {
+  selectedDistrict.value = '';
+  districtOptions.value = [];
+  if (value) await fetchDistrictOptions(value);
+};
+
+const searchSectionRef = ref(null);
+
+// const handleBackButton = () => {
+//   selectedReview.value = null;
+//   // 검색 섹션 다시 표시
+//   setTimeout(() => {
+//     if (searchSectionRef.value) {
+//       searchSectionRef.value.classList.remove('hidden');
+//     }
+//   }, 300);
+// };
+
+const handleBackButton = () => {
+  // 모든 상태 초기화
+  selectedReview.value = null;
+  selectedCampsite.value = null;
+  reviews.value = [];
+
+  // 검색 섹션이 숨겨져 있었다면 다시 표시
+  if (searchSectionRef.value) {
+    searchSectionRef.value.classList.remove('hidden');
+  }
+};
+
+const selectReview = (review) => {
+  selectedReview.value = review;
+  // 검색 섹션 숨김 처리
+  setTimeout(() => {
+  if (searchSectionRef.value) {
+    searchSectionRef.value.classList.add('hidden');
+  }
+  }, 300); // 리뷰 슬라이드 애니메이션이 끝난 후 검색 섹션 숨김
+};
+
+const navigateToDetail = (campingId) => {
+  window.location.href = `/detail/campings/${campingId}`;
+};
+
+const onSearch = () => {
+  currentPage.value = 1; // 검색 시 페이지 초기화
+  fetchCampings(1);
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchCampings(currentPage.value);
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchCampings(currentPage.value);
+  }
+};
+
+onMounted(() => {
+  fetchRegionOptions();
+  fetchCampings();
+});
+</script>
+
+<style scoped>
+.view-review {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  transition: all 0.3s ease-in-out;
+  border-right: 1px solid #e5e7eb;
+  flex: 1;
+  min-width: 0;
+}
+
+.section.search {
+  flex-basis: 60%;
+  margin-right: 40px;
+}
+
+.section.reviews {
+  flex-basis: 40%;
+  transition: all 0.3s ease-in-out;
+  transform: translateX(0);
+}
+
+.section.reviews.left {
+  flex-basis: 40%;
+  transform: translateX(0);
+  margin-right: 40px;
+}
+
+.section.reviews.expanded {
+  flex-basis: 60%;
+}
+
+.section.detail {
+  flex-basis: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  margin-left: 40px;
+}
+
+.section.search:not(.expanded) {
+  flex-basis: 40%;
+  margin-right: 40px;
+}
+
+.section.detail.expanded {
+  flex-basis: 60%;
+  opacity: 1;
+  visibility: visible;
+  padding: 24px;
+  margin: initial;
+}
+
+.section.hidden {
+  flex-basis: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.header h2 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.search-container {
+  display: flex; /* flex를 활성화 */
+  flex-direction: row; /* 가로 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  gap: 8px; /* 검색 바와 버튼 사이 간격 */
+}
+
+.search-bar {
+  flex: 1;
+  width: 70% !important;
+  max-width: 300px;
+  min-width: 90%;
+  padding: 0 !important;
+  margin: 0 0 24px !important;
+  align-self: center;
+}
+
+.search-button {
+  margin: 0 0 24px !important;
+}
+
+.select-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.campsite-list {
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start !important;
+  font-size: 0.7rem;
+}
+
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.list-item:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-2px);
+}
+
+.list-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.list-item-content h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.list-item-content p {
+  color: #666;
+  font-size: 0.7rem;
+}
+
+.list-item-content > div {
+  flex-grow: 1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 16px 0;
+}
+
+.pagination span {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.campsite-content-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.back-button:hover {
+  color: #111827;
+}
+
+.placeholder {
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.review-list {
+  padding: 24px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.review-header h2 {
+  font-size: 1.3rem;
+  padding: 10px;
+  font-weight: 600;
+}
+
+.review-count {
+  color: #6b7280;
+  font-size: 0.9rem;
+  padding: 10px;
+}
+
+.reviews-container {
+  display: flex;
+  flex-direction: column;
+  margin: 16px;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+}
+
+.review-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.review-date {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.review-preview {
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.review-detail {
+  padding: 24px;
+}
+
+.review-detail h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.review-content {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #374151;
+  background-color: #f9fafb;
+  padding: 24px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+}
+
+.review-detail p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+/* 아이콘 스타일 */
+.fas {
+  margin-right: 6px;
+}
+
+.info-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.info-button img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.info-button:hover img {
+  transform: scale(1.1);
+}
+
+.no-results {
+  text-align: center;
+  font-size: 1rem;
+  color: #777;
+  margin-top: 100px;
+}
+
+.placeholder {
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: #666;
+  font-size: 1rem;
+  text-align: center;
+  padding: 40px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #e5e7eb;
+}
+
+.view-review > .section:last-child {
+  padding: 0;
+  margin: 0;
+}
+</style>

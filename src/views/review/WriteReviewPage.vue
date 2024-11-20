@@ -1,10 +1,10 @@
 <template>
-  <div class="view-campsites">
+  <div class="write-review">
     <!-- 좌측: 캠핑장 검색 -->
     <div class="section-left" :class="{ 'expanded': !selectedCampsite }">
       <!-- 검색 헤더 -->
       <div class="header">
-        <h2>리뷰할 캠핑장 선택하기</h2>
+        <h2>캠핑장 선택하기</h2>
       </div>
 
       <!-- 검색 필터 -->
@@ -45,12 +45,20 @@
             v-for="camping in campings"
             :key="camping.id"
             class="list-item"
-            @click="selectedCampsite = camping"
           >
-            <h3>{{ camping.name }}</h3>
-            <p>{{ camping.detailAddress }}</p>
+            <div class="list-item-content" @click="selectedCampsite = camping">
+              <div>
+                <h3>{{ camping.name }}</h3>
+                <p>{{ camping.detailAddress }}</p>
+              </div>
+              <button
+                class="info-button"
+                @click.stop="navigateToDetail(camping.id)"
+              >
+                <img src="/images/info-icon.png" alt="Info" />
+              </button>
+            </div>
           </div>
-
           <div class="pagination">
             <ButtonLight
               class="button"
@@ -118,7 +126,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCampsites } from '@/api/campsiteApi.js';
 import {  getSidos, getGuguns } from '@/api/sidogugunApi.js'
-import { getPresignedUrl, uploadImageToS3 } from '@/api/reviewApi.js';
+import { createPresignedUrl, uploadImageToS3, submitReview } from '@/api/reviewApi.js';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
 import ButtonDark from '@/components/button/ButtonDark.vue';
@@ -137,7 +145,6 @@ const campings = ref([]);
 const selectedCampsite = ref(null);
 const reviewTitle = ref('');
 const reviewContent = ref('');
-const reviewImages = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 9;
 const totalItems = ref(0);
@@ -212,41 +219,67 @@ const handleBackButton = () => {
 const submitReviewHandler = async () => {
   if (!isValidForm.value) return;
 
-  try{
-   // 이미지 업로드 및 URL 수집
-   const uploadedImageUrls = [];
-    for (const image of reviewImages.value) {
-      const presignedUrl = await getPresignedUrl(image.name);
-      const uploadedUrl = await uploadImageToS3(presignedUrl, image);
-      uploadedImageUrls.push(uploadedUrl);
+  try {
+    // 1. 에디터 내용에서 HTML 가져오기
+    let editorContent = reviewContent.value;
+
+    // 2. HTML 파싱하여 이미지 태그의 src 속성 추출
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = editorContent;
+    const images = tempDiv.querySelectorAll('img');
+
+    // 업로드된 이미지 URL 수집
+    const uploadedImageUrls = [];
+
+    for (const img of images) {
+      const localSrc = img.src;
+
+      if (localSrc.startsWith('blob:')) {
+        // S3 업로드
+        const fileName = `image_${Date.now()}`; // 고유 파일 이름 생성
+        const response = await fetch(localSrc); // 로컬 이미지 URL에서 파일 가져오기
+        const blob = await response.blob(); // Blob으로 변환
+
+        const presignedUrl = (await createPresignedUrl(fileName, blob.type)).data.result;
+        await uploadImageToS3(presignedUrl, blob);
+
+        const s3Url = presignedUrl.split('?')[0]; // S3 URL 추출
+        img.src = s3Url; // 에디터 HTML에 S3 URL 대체
+        uploadedImageUrls.push(s3Url); // 업로드된 이미지 URL 저장
+      }
     }
 
-    // 리뷰 데이터 제출
+    // 3. 변환된 HTML 반영
+    editorContent = tempDiv.innerHTML;
+
+    // 4. 리뷰 데이터 생성
     const reviewData = {
       campingId: selectedCampsite.value.id,
       title: reviewTitle.value,
-      content: reviewContent.value,
-      reviewImageList: uploadedImageUrls,
+      content: editorContent,
+      imageUrls: uploadedImageUrls, // 업로드된 이미지 URL 포함
     };
 
-    console.log('리뷰 : ', reviewData);
-    // await submitReview(reviewData);
+    // 5. 서버로 리뷰 데이터 전송
+    await submitReview(reviewData);
 
+    // 6. 성공 메시지 및 페이지 이동
     Swal.fire({
-    title: '리뷰 제출 완료',
-    text: '리뷰가 성공적으로 제출되었습니다.',
-    icon: 'success',
-    confirmButtonText: '확인',
-    confirmButtonColor: '#0077b6',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.push('/'); // 리뷰보기 화면으로
-    }
-  });
+      title: '리뷰 제출 완료',
+      text: '리뷰가 성공적으로 제출되었습니다.',
+      icon: 'success',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#0077b6',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push(`./detail/campings/${reviewData.campingId}`);
+      }
+    });
   } catch (error) {
     console.error('리뷰 제출 과정에서 오류가 발생했습니다:', error);
   }
 };
+
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
@@ -269,13 +302,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.view-campsites {
+.write-review {
   display: flex;
   flex-direction: row;
   min-height: 100vh;
   background-color: #f9fafb;
   padding: 40px;
   gap: 40px;
+  position: relative;
+  overflow: hidden;
 }
 
 .section-left {
@@ -294,6 +329,7 @@ onMounted(() => {
 .section-right {
   width: 40%;
   transition: width 0.3s ease;
+  border-right: 1px solid #e5e7eb;
   padding: 24px;
   background-color: #ffffff;
   border-radius: 8px;
@@ -352,7 +388,9 @@ onMounted(() => {
 }
 
 .list-item {
-  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -362,15 +400,27 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
-.list-item h3 {
+
+.list-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.list-item-content h3 {
   font-size: 0.9rem;
   font-weight: 500;
   margin-bottom: 8px;
 }
 
-.list-item p {
+.list-item-content p {
   color: #666;
   font-size: 0.7rem;
+}
+
+.list-item-content > div {
+  flex-grow: 1;
 }
 
 .pagination {
@@ -389,9 +439,9 @@ onMounted(() => {
 
 .no-results {
   text-align: center;
-  color: #666;
-  padding: 24px;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  color: #777;
+  margin-top: 100px;
 }
 
 .campsite-content-row {
@@ -452,6 +502,31 @@ onMounted(() => {
   align-items: flex-start;
   justify-content: center;
   color: #666;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  text-align: center;
+  padding: 40px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #e5e7eb;
+}
+
+
+.info-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.info-button img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.info-button:hover img {
+  transform: scale(1.1);
 }
 </style>
