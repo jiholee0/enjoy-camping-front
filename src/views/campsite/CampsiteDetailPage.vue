@@ -164,9 +164,6 @@ const handlePageChange = (newPage) => {
 
 <style scoped>
 .detail-page {
-  width: 60%;
-  margin: 0 auto;
-  background-color: #f9fafb;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -175,8 +172,9 @@ const handlePageChange = (newPage) => {
 
 .image-container {
   position: relative;
-  width: 100%;
+  width: 90%;
   height: 400px;
+  max-width: 1000px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -193,7 +191,6 @@ const handlePageChange = (newPage) => {
   position: absolute;
   inset: 0;
   width: 100%;
-  margin: 0 auto;
   background: linear-gradient(
     to bottom,
     transparent 0%,

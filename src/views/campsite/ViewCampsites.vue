@@ -160,9 +160,6 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 16px;
-  width: 60%;
-  margin: 0 auto;
-  background-color: #f9fafb;
   position: relative;
   overflow: hidden;
 }

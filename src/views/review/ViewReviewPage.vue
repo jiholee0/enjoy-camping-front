@@ -331,7 +331,7 @@ onMounted(async () => {
   padding: 40px;
   position: relative;
   overflow: hidden;
-  width: 90%;
+  width: 70%;
   margin: 0 auto;
 }
 

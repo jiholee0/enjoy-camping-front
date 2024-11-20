@@ -149,9 +149,6 @@ onMounted(() => {
 
 <style scoped>
 .viewAttractions {
-  width: 60%;
-  margin: 0 auto;
-  background-color: #f9fafb;
   display: flex;
   flex-direction: column;
   align-items: center;
