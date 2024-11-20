@@ -2,10 +2,10 @@
   <div class="review-card2">
     <div class="card-content">
       <h3 class="card-title">{{ title }}</h3>
-      <p class="card-body">{{ content }}</p>
+      <div class="card-body" v-html="truncateContent(content)"></div>
     </div>
     <div class="card-footer">
-      <span class="card-date">{{ date }}</span>
+      <span class="card-date">{{ formatDate(date) }}</span>
     </div>
   </div>
 </template>
@@ -27,6 +27,31 @@ defineProps({
     required: true,
   },
 });
+
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  }).format(date);
+};
+
+const truncateContent = (content) => {
+  if (!content) return '';
+  // HTML 파싱
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, 'text/html');
+  const textContent = doc.body.textContent || '';
+
+  // 100자 제한 후 HTML 유지
+  const truncatedText = textContent.length > 100 ? textContent.substring(0, 100) + '...' : textContent;
+  return truncatedText;
+};
 </script>
 
 <style scoped>

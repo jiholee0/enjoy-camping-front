@@ -10,7 +10,7 @@
       :key="review.id"
       :title="review.title"
       :content="review.displayContent"
-      :date="review.date"
+      :date="review.createdAt"
     />
   </div>
 </template>
