@@ -39,6 +39,7 @@ import TabMenu from '@/components/tab/TabMenu.vue';
 import ReviewCard2List from '@/layout/list/ReviewCard2List.vue';
 import { getCampsiteDetail } from '@/api/campsiteApi';
 import { getNearByCampsite } from '@/api/attractionApi';
+import { getReviewByCampsite } from '@/api/reviewApi'; // 리뷰 API 추가
 
 // tabs 배열 초기화
 const tabs = ref([]);
@@ -54,6 +55,7 @@ const latitude = ref(0); // 기본값 설정
 const longitude = ref(0); // 기본값 설정
 
 const nearbyCampsite = ref([]);
+const reviewData = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 9;
 const totalItems = ref(0);
@@ -61,15 +63,8 @@ const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 const order = ref('distance');
 const sort = ref('asc');
 
-const reviewData = ref([
-  { id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  // 더 많은 리뷰 데이터...
-]);
-
 watch(
-  [nearbyCampsite, currentPage, totalPages],
+  [nearbyCampsite, reviewData, currentPage, totalPages],
   () => {
     tabs.value = [
       {
@@ -98,7 +93,7 @@ watch(
 const route = useRoute();
 
 // 데이터 업데이트 시점에 따라 reactivity 추가
-onMounted(async() => {
+onMounted(async () => {
   try {
     const id = route.params.id; // 경로에서 id 가져오기
     const response = await getCampsiteDetail(id); // API 호출
@@ -114,7 +109,7 @@ onMounted(async() => {
     latitude.value = data.latitude || 0;
     longitude.value = data.longitude || 0;
 
-    await fetchNearByCampsite(id);
+    await Promise.all([fetchNearByCampsite(id), fetchCampsiteReviews(id)]);
   } catch (error) {
     console.error('Failed to fetch detail data:', error);
   }
@@ -139,6 +134,18 @@ const fetchNearByCampsite = async (id) => {
   }
 };
 
+// 리뷰 데이터를 가져오는 함수
+const fetchCampsiteReviews = async (id) => {
+  try {
+    const response = await getReviewByCampsite(id); // 리뷰 API 호출
+    reviewData.value = response.data.result || [];
+  } catch (error) {
+    console.error('Failed to fetch reviews:', error);
+    reviewData.value = [];
+    throw error;
+  }
+};
+
 // 이미지 에러 핸들러
 const handleImageError = (event) => {
   image.value = '';
@@ -154,8 +161,12 @@ const handlePageChange = (newPage) => {
 };
 </script>
 
+
 <style scoped>
 .detail-page {
+  width: 60%;
+  margin: 0 auto;
+  background-color: #f9fafb;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -173,23 +184,21 @@ const handlePageChange = (newPage) => {
 }
 
 .background-image {
-  width: 90%;
+  width: 100%;
   height: 100%;
-  max-width: 1000px;
   object-fit: cover;
 }
 
 .gradient-overlay {
   position: absolute;
   inset: 0;
-  width: 90%;
-  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
   background: linear-gradient(
     to bottom,
     transparent 0%,
     transparent 50%,
-    rgba(255, 255, 255, 0.9) 100%
+    rgba(249, 255, 251, 0.9) 100%
   );
 }
 
@@ -200,15 +209,14 @@ const handlePageChange = (newPage) => {
 .detail-info-overlay {
   position: absolute;
   bottom: 0;
-  width: 90%;
-  max-width: 1000px;
+  width: 100%;
   padding: 1.5rem;
   border-radius: 0.5rem;
   background: linear-gradient(
     to top,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.9) 40%,
-    rgba(255, 255, 255, 0.6) 80%,
+    rgba(249, 255, 251, 1) 0%,
+    rgba(249, 255, 251, 0.9) 40%,
+    rgba(249, 255, 251, 0.6) 80%,
     transparent 100%
   );
 }
