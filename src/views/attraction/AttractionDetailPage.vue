@@ -141,6 +141,9 @@ const handlePageChange = (newPage) => {
 
 <style scoped>
 .detail-page {
+  width: 60%;
+  margin: 0 auto;
+  background-color: #f9fafb;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -158,23 +161,21 @@ const handlePageChange = (newPage) => {
 }
 
 .background-image {
-  width: 90%;
+  width: 100%;
   height: 100%;
-  max-width: 1000px;
   object-fit: cover;
 }
 
 .gradient-overlay {
   position: absolute;
   inset: 0;
-  width: 90%;
-  max-width: 1000px;
+  width: 100%;
   margin: 0 auto;
   background: linear-gradient(
     to bottom,
     transparent 0%,
     transparent 50%,
-    rgba(255, 255, 255, 0.9) 100%
+    rgba(249, 250, 251, 0.9) 100%
   );
 }
 
@@ -185,15 +186,14 @@ const handlePageChange = (newPage) => {
 .detail-info-overlay {
   position: absolute;
   bottom: 0;
-  width: 90%;
-  max-width: 1000px;
+  width: 100%;
   padding: 1.5rem;
   border-radius: 0.5rem;
   background: linear-gradient(
     to top,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.9) 40%,
-    rgba(255, 255, 255, 0.6) 80%,
+    rgba(249, 250, 251, 1) 0%,
+    rgba(249, 250, 251, 0.9) 40%,
+    rgba(249, 250, 251, 0.6) 80%,
     transparent 100%
   );
 }
@@ -219,7 +219,7 @@ const handlePageChange = (newPage) => {
 }
 
 .map-title {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
   color: #333;
   padding-bottom: 20px;

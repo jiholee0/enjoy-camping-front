@@ -91,6 +91,7 @@
           <span class="review-count">총 {{ reviews.length }}개의 리뷰</span>
         </div>
         <div v-if="reviews.length > 0" class="reviews-container">
+
           <div
             v-for="review in reviews"
             :key="review.id"
@@ -136,6 +137,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { getCampsites } from '@/api/campsiteApi.js';
 import { getReviewByCampsite } from '@/api/reviewApi.js'
 import { getSidos, getGuguns } from '@/api/sidogugunApi.js';
@@ -160,6 +162,8 @@ const totalItems = ref(0);
 
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
 
+const router = useRouter();
+
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -167,7 +171,9 @@ const formatDate = (dateString) => {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
   }).format(date);
 };
 
@@ -241,16 +247,6 @@ const onRegionChange = async (value) => {
 
 const searchSectionRef = ref(null);
 
-// const handleBackButton = () => {
-//   selectedReview.value = null;
-//   // 검색 섹션 다시 표시
-//   setTimeout(() => {
-//     if (searchSectionRef.value) {
-//       searchSectionRef.value.classList.remove('hidden');
-//     }
-//   }, 300);
-// };
-
 const handleBackButton = () => {
   // 모든 상태 초기화
   selectedReview.value = null;
@@ -274,7 +270,7 @@ const selectReview = (review) => {
 };
 
 const navigateToDetail = (campingId) => {
-  window.location.href = `/detail/campings/${campingId}`;
+  router.push(`/detail/campings/${campingId}`);
 };
 
 const onSearch = () => {
@@ -311,6 +307,8 @@ onMounted(() => {
   padding: 40px;
   position: relative;
   overflow: hidden;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .section {
@@ -526,10 +524,11 @@ onMounted(() => {
 .reviews-container {
   display: flex;
   flex-direction: column;
-  margin: 16px;
+  margin-top: 16px;
   gap: 16px;
   overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 150px);
+  position: relative;
 }
 
 .review-card {
