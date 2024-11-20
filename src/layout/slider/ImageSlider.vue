@@ -129,8 +129,7 @@ watch(() => props.interval, () => {
   align-items: center;
   justify-content: center;
   position: relative;
-  max-width: 1100px !important;
-  margin: auto;
+  margin: 30px 0px !important;
   overflow: hidden;
   gap: 20px;
   padding: 0 !important;
