@@ -388,18 +388,22 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+.filter-container {
+  width: 100%;
+}
+
 .search-container {
   display: flex; /* flex를 활성화 */
   flex-direction: row; /* 가로 정렬 */
   align-items: center; /* 세로 중앙 정렬 */
   gap: 8px; /* 검색 바와 버튼 사이 간격 */
+  width: 100%;
 }
 
 .search-bar {
   flex: 1;
+  min-width: auto !important;
   width: 70% !important;
-  max-width: 300px;
-  min-width: 90%;
   padding: 0 !important;
   margin: 0 0 24px !important;
   align-self: center;
