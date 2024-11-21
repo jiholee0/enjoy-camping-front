@@ -27,4 +27,12 @@ const getReviewByCampsite = (index) => {
   return apiClient.get(`/reviews/campings/${index}`);
 };
 
-export { createPresignedUrl, uploadImageToS3, submitReview, getReviewDetail, getReviewByCampsite };
+const updateReview = (newReview) => {
+  return apiClient.patch(`reviews/${newReview.index}`);
+}
+
+const deleteReview = (index) => {
+  return apiClient.delete(`reviews/${index}`);
+}
+
+export { createPresignedUrl, uploadImageToS3, submitReview, getReviewDetail, getReviewByCampsite, updateReview, deleteReview };

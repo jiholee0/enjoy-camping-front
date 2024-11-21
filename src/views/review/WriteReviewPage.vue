@@ -133,6 +133,9 @@ import ButtonDark from '@/components/button/ButtonDark.vue';
 import TipTapEditor from '@/components/editor/TipTapEditor.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import Swal from 'sweetalert2';
+import { v4 as uuidv4 } from 'uuid';
+import Compressor from 'compressorjs';
+
 
 const router = useRouter();
 
@@ -218,6 +221,18 @@ const handleBackButton = () => {
 
 const submitReviewHandler = async () => {
   if (!isValidForm.value) return;
+
+  const loadingSwal = Swal.fire({
+    title: '업로드 중...',
+    text: '리뷰를 업로드하고 있습니다. 잠시만 기다려주세요.',
+    icon: 'info',
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading(); // 로딩 애니메이션 활성화
+    },
+  });
+
   try {
     // 1. 에디터 내용에서 HTML 가져오기
     let editorContent = reviewContent.value;
@@ -227,52 +242,71 @@ const submitReviewHandler = async () => {
     tempDiv.innerHTML = editorContent;
     const images = Array.from(tempDiv.querySelectorAll('img'));
 
-    // 이미지 업로드를 병렬로 처리할 배열 준비
-    const imageUploadPromises = [];
-    const uploadedImageUrls = [];
+    // 프리사인드 URL 요청 병렬화
+    const presignedUrlPromises = images.map(async (img) => {
+      if (img.src.startsWith('blob:') || img.src.startsWith('data:image/')) {
+        const localSrc = img.src;
+        const fileName = `image_${uuidv4()}`;
+        const response = await fetch(localSrc);
+        const blob = await response.blob();
 
-    // 모든 이미지에 대해 병렬 처리
-    for (let i = 0; i < images.length; i++) {
-      const img = images[i];
-      const localSrc = img.src;
+        // 이미지 압축 처리
+        const compressedBlob = await compressImage(blob);
 
-      if (localSrc.startsWith('blob:')) {
-        const uploadPromise = (async () => {
-          // S3 업로드 준비
-          const fileName = `image_${Date.now()}_${i}`; // 고유 파일 이름 생성
-          const response = await fetch(localSrc);
-          const blob = await response.blob();
-
-          // presigned URL 생성 시간 측정
-          const presignedUrl = (await createPresignedUrl(fileName, blob.type)).data.result;
-
-          await uploadImageToS3(presignedUrl, blob);
-
-          const s3Url = presignedUrl.split('?')[0];
-          img.src = s3Url;
-          uploadedImageUrls.push(s3Url);
-
-          return { index: i, s3Url };
-        })();
-
-        imageUploadPromises.push(uploadPromise);
+        const presignedUrlResponse = await createPresignedUrl(fileName, compressedBlob.type);
+        return {
+          presignedUrl: presignedUrlResponse.data.result,
+          blob: compressedBlob,
+          img,
+          localSrc,
+        };
       }
-    }
+      return null;
+    });
 
-    await Promise.all(imageUploadPromises);
+    // 프리사인드 URL 요청 결과 처리
+    const presignedUrlResults = await Promise.allSettled(presignedUrlPromises);
 
-    editorContent = tempDiv.innerHTML;
+    // 이미지 업로드 병렬 처리
+    const imageUploadPromises = presignedUrlResults
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(async ({ value }) => {
+        const { presignedUrl, blob, localSrc } = value;
+        try {
+          await uploadImageToS3(presignedUrl, blob);
+          const s3Url = presignedUrl.split('?')[0];
+          return {
+            localSrc,
+            s3Url,
+          };
+        } catch (error) {
+          console.error(`이미지 업로드 실패:`, error);
+          return null;
+        }
+      });
+
+    // 모든 이미지 업로드가 완료될 때까지 대기
+    const uploadedImages = (await Promise.allSettled(imageUploadPromises))
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(result => result.value);
+
+    // 업로드된 이미지의 src를 S3 URL로 변경
+    uploadedImages.forEach(({ localSrc, s3Url }) => {
+      editorContent = editorContent.replace(localSrc, s3Url);
+    });
+
+    // 업로드된 이미지의 URL만 추출하여 Set에 추가
+    const imageUrls = new Set(uploadedImages.map(({ s3Url }) => s3Url));
 
     const reviewData = {
       campingId: selectedCampsite.value.id,
       title: reviewTitle.value,
       content: editorContent,
-      imageUrls: uploadedImageUrls,
+      imageUrls: Array.from(imageUrls),
     };
 
     const response = await submitReview(reviewData);
     const newReview = response.data.result;
-
 
     Swal.fire({
       title: '리뷰 제출 완료',
@@ -282,19 +316,33 @@ const submitReviewHandler = async () => {
       confirmButtonColor: '#0077b6',
     }).then((result) => {
       if (result.isConfirmed) {
-        // router.push(`./detail/campings/${reviewData.campingId}`);
         router.push({
-        name: 'ViewReviewPage',
-        query: {
-          campsiteId: selectedCampsite.value.id,
-          reviewId: newReview.id,
-        },
-      });
+          name: 'ViewReviewPage',
+          query: {
+            campsiteId: selectedCampsite.value.id,
+            reviewId: newReview.id,
+          },
+        });
       }
     });
   } catch (error) {
     console.error('리뷰 제출 과정에서 오류가 발생했습니다:', error);
   }
+  await loadingSwal.close();
+};
+
+const compressImage = (blob) => {
+  return new Promise((resolve, reject) => {
+    new Compressor(blob, {
+      quality: 0.6,
+      success(result) {
+        resolve(result);
+      },
+      error(err) {
+        reject(err);
+      },
+    });
+  });
 };
 
 const nextPage = () => {

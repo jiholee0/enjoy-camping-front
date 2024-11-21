@@ -175,21 +175,39 @@ onMounted(() => {
 });
 
 const handleDrop = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
   const files = event.dataTransfer.files;
-  if (files.length === 0) return;
 
-  const file = files[0];
-  if (!file.type.startsWith('image/')) return;
+  if (!files || files.length === 0) return;
 
-  const previewUrl = URL.createObjectURL(file);
-  editor.value.chain().focus().insertContent({
-    type: 'resizableImage',
-    attrs: {
-      src: previewUrl,
-      width: '100%',
-      height: 'auto'
-    }
-  }).run();
+  // 현재 에디터의 선택 상태 저장
+  const { state } = editor.value;
+  const { selection } = state;
+
+  // 이미지 파일만 필터링
+  const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+  imageFiles.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // 각 이미지마다 다른 위치에 삽입
+      editor.value.chain()
+        .focus()
+        .setTextSelection(selection.from + index) // 이전 삽입 위치 다음으로 이동
+        .insertContent({
+          type: 'resizableImage',
+          attrs: {
+            src: e.target.result,
+            width: '100%',
+            height: 'auto',
+          },
+        })
+        .run();
+    };
+    reader.readAsDataURL(file);
+  });
 };
 
 const onUpdate = () => {

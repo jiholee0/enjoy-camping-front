@@ -8,7 +8,6 @@ import ViewAttractions from "@/views/attraction/ViewAttractions.vue";
 import AttractionDetailPage from "@/views/attraction/AttractionDetailPage.vue";
 import CampsiteDetailPage from "@/views/campsite/CampsiteDetailPage.vue";
 import WriteReviewPage from "@/views/review/WriteReviewPage.vue";
-import ReviewDetailPage from "@/views/review/ReviewDetailPage.vue";
 import ViewReviewPage from "@/views/review/ViewReviewPage.vue";
 import MyPage from "@/views/user/MyPage.vue";
 
@@ -45,11 +44,6 @@ const routes = [
     path: "/viewReviews",
     name: "ViewReviewPage",
     component: ViewReviewPage,
-  },
-  {
-    path: "/detail/reviews/:id",
-    name: "ReviewDetailPage",
-    component: ReviewDetailPage,
   },
   { path: "/myPage", name: "MyPage", component: MyPage },
 ];

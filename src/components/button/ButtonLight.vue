@@ -23,7 +23,7 @@ defineProps({
   border-radius: 5px;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.3s;
+  transition: color 0.5s;
   margin-right: 0.5rem;
 }
 

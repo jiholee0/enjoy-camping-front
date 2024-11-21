@@ -25,7 +25,7 @@ defineProps({
   border-radius: 5px;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.5s;
   margin-right: 0.5rem;
 }
 

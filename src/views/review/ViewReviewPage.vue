@@ -129,6 +129,19 @@
           <h2>{{ selectedReview.title }}</h2>
           <p>{{ formatDate(selectedReview.createdAt) }}</p>
           <div class="review-content" v-html="selectedReview.content"></div>
+          <!-- 우측 하단 버튼 -->
+          <div class="review-actions">
+            <ButtonLight
+              class="edit-button"
+              @click="editReviewAction(selectedReview.id)"
+              label="리뷰 수정하기"
+            />
+            <ButtonLight
+              class="delete-button"
+              @click="deleteReviewAction(selectedReview.id)"
+              label="리뷰 삭제하기"
+            />
+          </div>
         </div>
       </transition>
     </div>
@@ -139,12 +152,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCampsites, getCampsiteDetail } from '@/api/campsiteApi.js';
-import { getReviewByCampsite } from '@/api/reviewApi.js'
+import { getReviewByCampsite, deleteReview } from '@/api/reviewApi.js'
 import { getSidos, getGuguns } from '@/api/sidogugunApi.js';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
+import Swal from 'sweetalert2';
 
 const searchQuery = ref('');
 const selectedRegion = ref('');
@@ -278,6 +292,61 @@ const onSearch = () => {
   currentPage.value = 1; // 검색 시 페이지 초기화
   fetchCampings(1);
 };
+
+const deleteReviewAction = (index) => {
+  Swal.fire({
+    title: '리뷰를 삭제하시겠습니까?',
+    text: '삭제된 리뷰는 복구할 수 없습니다.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '삭제',
+    cancelButtonText: '취소',
+    confirmButtonColor: '#b32020',
+    cancelButtonColor: '#c1c1c1',
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const loadingSwal = Swal.fire({
+          title: '삭제 중...',
+          text: '리뷰를 삭제하고 있습니다. 잠시만 기다려주세요.',
+          icon: 'info',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading(); // 로딩 애니메이션 활성화
+          },
+        });
+
+        await deleteReview(index); // 리뷰 삭제 API 호출
+
+        await loadingSwal.close();
+
+        Swal.fire({
+          title: '삭제 완료',
+          text: '리뷰가 성공적으로 삭제되었습니다.',
+          icon: 'success',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+        });
+        selectedReview.value = null; // 삭제 후 선택된 리뷰 초기화
+        await fetchReviewsForCampsite(selectedCampsite.value); // 리뷰 목록 다시 불러오기
+      } catch (error) {
+        Swal.fire({
+          title: '삭제 실패',
+          text: '리뷰 삭제 중 문제가 발생했습니다. 다시 시도해주세요.',
+          icon: 'error',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+        });
+        console.error('리뷰 삭제 과정에서 오류가 발생했습니다:', error);
+      }
+    }
+  });
+}
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
@@ -674,5 +743,46 @@ onMounted(async () => {
 .view-review > .section:last-child {
   padding: 0;
   margin: 0;
+}
+
+.review-actions {
+  margin-top: 20px; /* 버튼과 내용 간격 */
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 10px; /* 버튼 간 간격 */
+}
+
+.edit-button {
+  background-color: #f0f0f0;
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.5s;
+  margin-right: 0.5rem;
+}
+
+.edit-button:hover {
+  background-color: #c1c1c1;
+  color: black;
+}
+
+.delete-button {
+  background-color: #b32020;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.5s;
+  margin-right: 0.5rem;
+}
+
+.delete-button:hover {
+  background-color: #bb7777;
+  color: white;
 }
 </style>
