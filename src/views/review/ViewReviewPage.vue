@@ -83,7 +83,7 @@
       <div v-if="selectedCampsite">
         <ButtonLight
           class="back-button"
-          @click="handleBackButton"
+          @click.capture="handleBackButton"
           label="← 캠핑장 선택으로 돌아가기"
         />
         <div class="review-header">
@@ -96,7 +96,7 @@
             v-for="review in reviews"
             :key="review.id"
             class="review-card"
-            @click="selectReview(review)"
+            @click.capture="selectReview(review)"
           >
             <div class="review-card-header">
               <h3 class="review-title">{{ review.title }}</h3>
@@ -123,24 +123,53 @@
         <div v-if="selectedReview" class="review-detail">
           <ButtonLight
             class="back-button"
-            @click="selectedReview = null"
+            @click.capture="selectedReview = null"
             label="← 리뷰 목록으로 돌아가기"
           />
-          <h2>{{ selectedReview.title }}</h2>
-          <p>{{ formatDate(selectedReview.createdAt) }}</p>
-          <div class="review-content" v-html="selectedReview.content"></div>
-          <!-- 우측 하단 버튼 -->
-          <div class="review-actions">
-            <ButtonLight
-              class="edit-button"
-              @click="editReviewAction(selectedReview.id)"
-              label="리뷰 수정하기"
+          <div v-if="!isEditing">
+            <h2>{{ selectedReview.title }}</h2>
+            <p>{{ formatDate(selectedReview.createdAt) }}</p>
+            <div class="review-content" v-html="selectedReview.content"></div>
+            <!-- 우측 하단 버튼 -->
+            <div class="review-actions">
+              <ButtonLight
+                class="edit-button"
+                @click.capture="startEditing"
+                label="리뷰 수정하기"
+              />
+              <ButtonLight
+                class="delete-button"
+                @click.capture="deleteReviewAction(selectedReview.id)"
+                label="리뷰 삭제하기"
+              />
+            </div>
+          </div>
+          <div v-else>
+            <!-- 수정 중인 화면 -->
+            <input
+              type="text"
+              v-model="editedReviewTitle"
+              class="input"
             />
-            <ButtonLight
-              class="delete-button"
-              @click="deleteReviewAction(selectedReview.id)"
-              label="리뷰 삭제하기"
+            <TipTapEditor
+              v-model="editedReviewContent"
+              class="editor"
+              @temp="method1"
+              @temp2="method2"
             />
+            <!-- 수정하기 및 취소하기 버튼 -->
+            <div class="review-actions">
+              <ButtonDark
+                class="cancel-button"
+                @click.capture="cancelEdit"
+                label="수정 취소"
+              />
+              <ButtonDark
+                class="save-button"
+                @click.capture="saveEdit"
+                label="수정 완료"
+              />
+            </div>
           </div>
         </div>
       </transition>
@@ -152,14 +181,24 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCampsites, getCampsiteDetail } from '@/api/campsiteApi.js';
-import { getReviewByCampsite, deleteReview } from '@/api/reviewApi.js'
+import { getReviewByCampsite, updateReview, deleteReview, uploadImageToS3, createPresignedUrl } from '@/api/reviewApi.js'
 import { getSidos, getGuguns } from '@/api/sidogugunApi.js';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import SearchBar from '@/components/search/SearchBar.vue';
 import SelectBox from '@/components/filter/SelectBox.vue';
+import TipTapEditor from '@/components/editor/TipTapEditor.vue';
 import Swal from 'sweetalert2';
+import { v4 as uuidv4 } from 'uuid';
+import Compressor from 'compressorjs';
 
+function method1(val) {
+  console.log("METHOD1 IS " +JSON.stringify(val))
+}
+
+function method2(val) {
+  console.log("METHOD22 IS " + JSON.stringify(val))
+}
 const searchQuery = ref('');
 const selectedRegion = ref('');
 const selectedDistrict = ref('');
@@ -169,6 +208,10 @@ const campings = ref([]);
 const reviews = ref([]);
 const selectedCampsite = ref(null);
 const selectedReview = ref(null);
+
+const isEditing = ref(false);
+const editedReviewTitle = ref(selectedReview.value ? selectedReview.value.title : '');
+const editedReviewContent = ref(selectedReview.value ? selectedReview.value.content : '');
 
 const currentPage = ref(1);
 const itemsPerPage = 9;
@@ -276,6 +319,10 @@ const handleBackButton = () => {
 
 const selectReview = (review) => {
   selectedReview.value = review;
+  isEditing.value = false;
+  editedReviewTitle.value = review.title;
+  editedReviewContent.value = review.content;
+
   // 검색 섹션 숨김 처리
   setTimeout(() => {
   if (searchSectionRef.value) {
@@ -291,6 +338,193 @@ const navigateToDetail = (campingId) => {
 const onSearch = () => {
   currentPage.value = 1; // 검색 시 페이지 초기화
   fetchCampings(1);
+};
+
+const startEditing = () => {
+  isEditing.value = true;
+  editedReviewTitle.value = selectedReview.value.title;
+  editedReviewContent.value = selectedReview.value.content;
+  // console.log(selectedReview.value.content)
+  // console.log(editedReviewContent.value)
+};
+const saveEdit = async () => {
+  const loadingSwal = Swal.fire({
+    title: '수정 중...',
+    text: '리뷰를 수정하고 있습니다. 잠시만 기다려주세요.',
+    icon: 'info',
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading(); // 로딩 애니메이션 활성화
+    },
+  });
+
+  try {
+    console.log('saveEdit 메소드 시작');
+
+    // 1. 에디터 내용에서 HTML 가져오기
+    let editorContent = editedReviewContent.value;
+    console.log('에디터 내용:', editorContent);
+
+    // 2. HTML 파싱하여 이미지 정보 추출
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = editorContent;
+    const images = Array.from(tempDiv.querySelectorAll('img[src]'));
+    console.log('추출한 이미지 목록:', images);
+
+    // 이미지의 src와 크기 정보 수집
+    const newReviewImages = images.map(img => ({
+      src: img.src,
+      width: img.style.width || '500px',
+      height: img.style.height || 'auto',
+      isNew: img.src.startsWith('blob:') || img.src.startsWith('data:image/')
+    }));
+    console.log('수집한 이미지 정보:', newReviewImages);
+
+    // 프리사인드 URL 요청 병렬화 (새로운 이미지만 처리)
+    const presignedUrlPromises = newReviewImages
+      .filter(imageInfo => imageInfo.isNew)
+      .map(async (imageInfo) => {
+        const img = images.find(imgElement => imgElement.src === imageInfo.src);
+        if (!img) return null;
+
+        const localSrc = img.src;
+        const fileName = `image_${uuidv4()}`;
+        const response = await fetch(localSrc);
+        const blob = await response.blob();
+
+        console.log('이미지 압축 전 blob:', blob);
+        const compressedBlob = await compressImage(blob);
+        console.log('이미지 압축 후 blob:', compressedBlob);
+
+        const presignedUrlResponse = await createPresignedUrl(fileName, compressedBlob.type);
+        console.log('프리사인드 URL 응답:', presignedUrlResponse);
+
+        return {
+          presignedUrl: presignedUrlResponse.data.result,
+          blob: compressedBlob,
+          img,
+          localSrc,
+          imageInfo
+        };
+      });
+
+    // 프리사인드 URL 요청 결과 처리
+    const presignedUrlResults = await Promise.allSettled(presignedUrlPromises);
+    console.log('프리사인드 URL 요청 결과:', presignedUrlResults);
+
+    // 이미지 업로드 병렬 처리 (새 이미지만)
+    const imageUploadPromises = presignedUrlResults
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(async ({ value }) => {
+        const { presignedUrl, blob, localSrc, imageInfo } = value;
+        try {
+          console.log('이미지 업로드 시작:', presignedUrl);
+          await uploadImageToS3(presignedUrl, blob);
+          const s3Url = presignedUrl.split('?')[0];
+          console.log('이미지 업로드 완료:', s3Url);
+
+          return {
+            localSrc,
+            s3Url,
+            width: imageInfo.width,
+            height: imageInfo.height
+          };
+        } catch (error) {
+          console.error('이미지 업로드 실패:', error);
+          return null;
+        }
+      });
+
+    // 모든 이미지 업로드가 완료될 때까지 대기
+    const uploadedImages = (await Promise.allSettled(imageUploadPromises))
+      .filter(result => result.status === 'fulfilled' && result.value !== null)
+      .map(result => result.value);
+    console.log('업로드된 이미지 목록:', uploadedImages);
+
+    // HTML 수정 로직 업데이트 (새 이미지만)
+    uploadedImages.forEach(({ localSrc, s3Url, width, height }) => {
+      images.forEach(img => {
+        const imgSrc = img.getAttribute('src');
+
+        if (imgSrc === localSrc) {
+          img.setAttribute('src', s3Url);
+          const styleObject = {
+            width,
+            height,
+            maxWidth: '100%',
+            display: 'block'
+          };
+          const styleString = Object.entries(styleObject)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('; ');
+          img.setAttribute('style', styleString);
+          console.log('이미지 업데이트 완료:', img);
+        }
+      });
+    });
+
+    // 최종 HTML 내용 업데이트
+    const finalContent = tempDiv.innerHTML;
+    console.log('최종 업데이트된 HTML:', finalContent);
+
+    const tempDivForImageUrls = document.createElement('div');
+    tempDivForImageUrls.innerHTML = finalContent;
+    const finalImages = Array.from(tempDivForImageUrls.querySelectorAll('img[src]'));
+    const imageUrls = finalImages.map(img => img.src);
+
+    // 리뷰 업데이트 요청
+    await updateReview(selectedReview.value.id, {
+      title: editedReviewTitle.value,
+      content: finalContent,
+      imageUrls: imageUrls
+    });
+    console.log('리뷰 업데이트 요청 완료');
+
+    // 로컬 상태 업데이트
+    selectedReview.value.title = editedReviewTitle.value;
+    selectedReview.value.content = finalContent;
+    isEditing.value = false;
+
+    await loadingSwal.close();
+
+    // 성공 알림
+    Swal.fire({
+      title: '수정 완료',
+      text: '리뷰가 성공적으로 수정되었습니다.',
+      icon: 'success',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#0077b6',
+    });
+  } catch (error) {
+    // 오류 알림
+    Swal.fire({
+      title: '수정 실패',
+      text: '리뷰 수정 중 문제가 발생했습니다. 다시 시도해주세요.',
+      icon: 'error',
+      confirmButtonText: '확인',
+      confirmButtonColor: '#0077b6',
+    });
+    console.error('리뷰 수정 과정에서 오류가 발생했습니다:', error);
+  }
+};
+
+const compressImage = (blob) => {
+  return new Promise((resolve, reject) => {
+    new Compressor(blob, {
+      quality: 0.6,
+      success(result) {
+        resolve(result);
+      },
+      error(err) {
+        reject(err);
+      },
+    });
+  });
+};
+
+const cancelEdit = () => {
+  isEditing.value = false;
 };
 
 const deleteReviewAction = (index) => {
@@ -784,5 +1018,64 @@ onMounted(async () => {
 .delete-button:hover {
   background-color: #bb7777;
   color: white;
+}
+
+.submit-button:disabled {
+  background-color: #81c3d7;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: #f0f0f0;
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.5s;
+  margin-right: 0.5rem;
+}
+
+.cancel-button:hover {
+  background-color: #c1c1c1;
+  color: black;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.editor {
+  min-height: 200px;
+  margin-bottom: 24px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.review-form {
+  padding: 24px;
+}
+
+.review-form h2 {
+  font-size: 1.3rem;
+  padding: 10px;
+  font-weight: 600;
+}
+
+.review-form .p1 {
+  font-size: 0.8rem;
+  color: #767676;
+  padding-top: 10px;
+}
+
+.review-form .p2 {
+  font-size: 0.8rem;
+  padding: 10px;
+  margin-bottom: 8px;
 }
 </style>

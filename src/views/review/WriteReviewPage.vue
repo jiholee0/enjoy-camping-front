@@ -254,6 +254,8 @@ const submitReviewHandler = async () => {
         const compressedBlob = await compressImage(blob);
 
         const presignedUrlResponse = await createPresignedUrl(fileName, compressedBlob.type);
+        console.log(presignedUrlResponse.data.result)
+
         return {
           presignedUrl: presignedUrlResponse.data.result,
           blob: compressedBlob,
@@ -275,6 +277,8 @@ const submitReviewHandler = async () => {
         try {
           await uploadImageToS3(presignedUrl, blob);
           const s3Url = presignedUrl.split('?')[0];
+          console.log(s3Url)
+
           return {
             localSrc,
             s3Url,
@@ -308,6 +312,8 @@ const submitReviewHandler = async () => {
     const response = await submitReview(reviewData);
     const newReview = response.data.result;
 
+    await loadingSwal.close();
+
     Swal.fire({
       title: '리뷰 제출 완료',
       text: '리뷰가 성공적으로 제출되었습니다.',
@@ -328,7 +334,6 @@ const submitReviewHandler = async () => {
   } catch (error) {
     console.error('리뷰 제출 과정에서 오류가 발생했습니다:', error);
   }
-  await loadingSwal.close();
 };
 
 const compressImage = (blob) => {
@@ -343,6 +348,10 @@ const compressImage = (blob) => {
       },
     });
   });
+};
+
+const navigateToDetail = (campingId) => {
+  router.push(`/detail/campings/${campingId}`);
 };
 
 const nextPage = () => {

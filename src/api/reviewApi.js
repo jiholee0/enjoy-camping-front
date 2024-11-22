@@ -27,8 +27,8 @@ const getReviewByCampsite = (index) => {
   return apiClient.get(`/reviews/campings/${index}`);
 };
 
-const updateReview = (newReview) => {
-  return apiClient.patch(`reviews/${newReview.index}`);
+const updateReview = (index, updatedReview) => {
+  return apiClient.patch(`reviews/${index}`, updatedReview);
 }
 
 const deleteReview = (index) => {

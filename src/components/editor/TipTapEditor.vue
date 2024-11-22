@@ -136,28 +136,35 @@ import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
 import CodeBlock from '@tiptap/extension-code-block';
 import Blockquote from '@tiptap/extension-blockquote';
-import Image from '@tiptap/extension-image';
 import ResizableImage from './ResizableImage';
+import CustomParagraph from './CustomParagraph';
+import CustomImage from './CustomImage';
 
 const props = defineProps({
   modelValue: String, // v-model을 위해 필요한 prop
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'temp', 'temp2']);
+// const emit = defineEmits(['update:modelValue']);
 
 const editor = ref(null);
 
 onMounted(() => {
+  console.log("!!!!!!! "+ props.modelValue)
   editor.value = new Editor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        paragraph: false, // 기본 Paragraph 노드 비활성화
+        image: false,     // 기본 Image 노드 비활성화
+      }),
+      CustomParagraph,
+      CustomImage,
       Bold,
       Italic,
       Underline,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
-      Image,
       Highlight,
       BulletList,
       OrderedList,
@@ -166,12 +173,21 @@ onMounted(() => {
       Blockquote,
       ResizableImage
     ],
-    content: '',
+    content: props.modelValue || '',
     onUpdate: ({ editor }) => {
       // 에디터 내용이 변경될 때 부모 컴포넌트로 이벤트 전달
+      // console.log(editor.value);
+      // emit('update:modelValue', editor.getDocument().toHTML());
+      // console.log(editor.getDocument().toHTML())
       emit('update:modelValue', editor.getHTML());
+      console.log('editor'+editor.getHTML())
     },
   });
+
+  watch(props.modelValue, (val) => {
+    console.log(val)
+  }, {immediate: true})
+
 });
 
 const handleDrop = (event) => {
@@ -210,16 +226,11 @@ const handleDrop = (event) => {
   });
 };
 
-const onUpdate = () => {
-  if (editor.value) {
-    emit('update:modelValue', editor.value.getHTML());
-  }
-};
-
 watch(
   () => props.modelValue,
   (newValue) => {
     if (editor.value && editor.value.getHTML() !== newValue) {
+      console.log(newValue +"eeeeee")
       editor.value.commands.setContent(newValue || '');
     }
   }
@@ -320,5 +331,11 @@ onBeforeUnmount(() => {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+:deep(.ProseMirror img) {
+  width: 100%; /* 원하는 크기로 수정 */
+  max-width: 100%;
+  height: auto;
 }
 </style>

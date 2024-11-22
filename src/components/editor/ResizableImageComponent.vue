@@ -14,7 +14,8 @@
         :src="node.attrs.src"
         :style="{
           width: width,
-          height: height
+          height: height,
+          maxWidth: '500px'
         }"
         @click.stop
         ref="imageRef"
@@ -132,7 +133,7 @@ const toggleImageBorder = () => {
 .image-container {
   position: relative;
   display: inline-block;
-  max-width: 100%;
+  max-width: 500px;
   border: 2px solid transparent;
   border-radius: 4px;
   transition: all 0.2s ease;
