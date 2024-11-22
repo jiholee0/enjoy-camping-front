@@ -1,5 +1,5 @@
 <template>
-  <div class="review-card2">
+  <div class="review-card2" @click="navigateToReview">
     <div class="card-content">
       <h3 class="card-title">{{ title }}</h3>
       <div class="card-body" v-html="truncateContent(content)"></div>
@@ -12,8 +12,9 @@
 
 <script setup>
 import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true,
@@ -26,7 +27,28 @@ defineProps({
     type: String,
     required: true,
   },
+  campsiteId: {
+    type: Number,
+    required: true,
+  },
+  reviewId: {
+    type: Number,
+    required: true,
+  },
 });
+
+const router = useRouter();
+
+// 리뷰 페이지로 이동하는 함수
+const navigateToReview = () => {
+  router.push({
+    name: 'ViewReviewPage',
+    query: {
+      campsiteId : props.campsiteId,
+      reviewId : props.reviewId,
+    },
+  });
+};
 
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {

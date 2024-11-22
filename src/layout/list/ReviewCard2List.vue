@@ -11,6 +11,8 @@
       :title="review.title"
       :content="review.displayContent"
       :date="review.createdAt"
+      :campsiteId="review.campingId"
+      :reviewId="review.id"
     />
   </div>
 </template>
