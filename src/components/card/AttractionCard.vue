@@ -1,5 +1,5 @@
 <template>
-  <div class="card" @click="goToDetail">
+  <div class="card" @click.capture="goToDetail">
     <div class="card-inner">
       <div class="image-container">
         <img :src="firstImage1 ? firstImage1 : NoImage" :alt="title" class="card-image" @error="handleImageError"/>

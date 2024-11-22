@@ -22,7 +22,7 @@
     <!-- Search Bar -->
     <div class="search-container">
       <SearchBar label="캠핑장 검색하기" @search="onSearch" v-model="searchQuery" />
-      <ButtonDark class="search-button" @click="onSearch" label="검색" />
+      <ButtonDark class="search-button" @click.capture="onSearch" label="검색" />
     </div>
 
     <!-- Campsite Grid -->

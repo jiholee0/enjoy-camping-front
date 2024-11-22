@@ -1,9 +1,9 @@
 <!-- CampsiteCardGrid.vue -->
 <template>
   <div class="pagination">
-    <ButtonLight class="button" @click="prevPage" :disabled="currentPage === 1" label="이전" />
+    <ButtonLight class="button" @click.capture="prevPage" :disabled="currentPage === 1" label="이전" />
     <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <ButtonLight class="button" @click="nextPage" :disabled="currentPage === totalPages" label="다음" />
+    <ButtonLight class="button" @click.capture="nextPage" :disabled="currentPage === totalPages" label="다음" />
   </div>
 
   <div class="grid-container">

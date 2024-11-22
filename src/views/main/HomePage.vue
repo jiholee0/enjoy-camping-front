@@ -3,7 +3,7 @@
     <ImageSlider class="imageSlider" :images="['/images/main(1).png', '/images/main(2).png', '/images/main(3).png']"
       :interval="5000" />
 
-    <ButtonDark class="view-all-campsites" label="View All Campsites" @click="viewAll" />
+    <ButtonDark class="view-all-campsites" label="View All Campsites" @click.capture="viewAll" />
     <div>
       <CampsiteCardGrid
         :campings="campings"
