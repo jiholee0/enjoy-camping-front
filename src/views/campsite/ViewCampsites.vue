@@ -70,7 +70,7 @@ const getSortParams = (sortValue) => {
     case '이름순':
       return { order: 'name', sort: 'asc' };
     case '리뷰많은순':
-      return { order: 'reviewCount', sort: 'desc' };
+      return { order: 'review_cnt', sort: 'desc' };
     default:
       return { order: 'id', sort: 'asc'};
   }
@@ -91,6 +91,7 @@ const fetchCampings = async (page = 1) => {
       sort: sort
   });
     campings.value = response.data.result;
+    console.log(campings.value)
     totalItems.value = response.data.totalCount;
   } catch (error) {
     console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);

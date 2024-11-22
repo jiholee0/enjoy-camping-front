@@ -10,6 +10,11 @@
         <div v-if="distance" class="distance-badge">
           {{ roundedDistance }} km
         </div>
+        <div
+          :class="distance ? 'review-badge-with-distance' : 'review-badge-alone'"
+        >
+          리뷰 {{ reviewCnt ? reviewCnt : 0 }}개
+        </div>
       </div>
       <div class="content-wrapper">
         <div class="card-content">
@@ -37,6 +42,7 @@ const props = defineProps({
   imageUrl: String,
   id: Number,
   distance: Number,
+  reviewCnt: Number,
 });
 
 const roundedDistance = computed(() => {
@@ -214,6 +220,34 @@ const handleImageError = (event) => {
   left: 16px;
   padding: 6px 12px;
   background-color: rgba(66, 153, 225, 0.9); /* 파란색 배경 */
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+
+.review-badge-with-distance {
+  position: absolute;
+  top: 48px; /* distance-badge 아래로 위치 */
+  left: 16px;
+  padding: 6px 12px;
+  background-color: rgba(255, 128, 128);
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+}
+
+.review-badge-alone {
+  position: absolute;
+  top: 16px; /* distance-badge 없을 때 기본 위치 */
+  left: 16px;
+  padding: 6px 12px;
+  background-color: rgba(255, 128, 128);
   border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 600;
