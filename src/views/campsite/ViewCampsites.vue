@@ -91,7 +91,6 @@ const fetchCampings = async (page = 1) => {
       sort: sort
   });
     campings.value = response.data.result;
-    console.log(campings.value)
     totalItems.value = response.data.totalCount;
   } catch (error) {
     console.error("캠핑장 데이터를 불러오는 중 오류가 발생했습니다:", error);

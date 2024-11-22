@@ -254,7 +254,6 @@ const submitReviewHandler = async () => {
         const compressedBlob = await compressImage(blob);
 
         const presignedUrlResponse = await createPresignedUrl(fileName, compressedBlob.type);
-        console.log(presignedUrlResponse.data.result)
 
         return {
           presignedUrl: presignedUrlResponse.data.result,
@@ -277,7 +276,6 @@ const submitReviewHandler = async () => {
         try {
           await uploadImageToS3(presignedUrl, blob);
           const s3Url = presignedUrl.split('?')[0];
-          console.log(s3Url)
 
           return {
             localSrc,

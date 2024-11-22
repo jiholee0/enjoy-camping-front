@@ -44,7 +44,6 @@ export default Node.create({
         getAttrs: element => {
           const styleString = element.getAttribute('style') || '';
           const styleObject = parseStyleString(styleString);
-          console.log(styleObject + "here")
           return {
             src: element.getAttribute('src'),
             alt: element.getAttribute('alt'),

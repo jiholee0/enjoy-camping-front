@@ -73,8 +73,6 @@ const handleLogin = () => {
     }
   });
 
-  console.log("Email:", email.value);
-  console.log("Password:", password.value);
   startCloseModal();
 };
 

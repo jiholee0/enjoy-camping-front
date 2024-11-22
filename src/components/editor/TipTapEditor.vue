@@ -150,7 +150,6 @@ const emit = defineEmits(['update:modelValue', 'temp', 'temp2']);
 const editor = ref(null);
 
 onMounted(() => {
-  console.log("!!!!!!! "+ props.modelValue)
   editor.value = new Editor({
     extensions: [
       StarterKit.configure({
@@ -175,19 +174,9 @@ onMounted(() => {
     ],
     content: props.modelValue || '',
     onUpdate: ({ editor }) => {
-      // 에디터 내용이 변경될 때 부모 컴포넌트로 이벤트 전달
-      // console.log(editor.value);
-      // emit('update:modelValue', editor.getDocument().toHTML());
-      // console.log(editor.getDocument().toHTML())
       emit('update:modelValue', editor.getHTML());
-      console.log('editor'+editor.getHTML())
     },
   });
-
-  watch(props.modelValue, (val) => {
-    console.log(val)
-  }, {immediate: true})
-
 });
 
 const handleDrop = (event) => {
@@ -230,7 +219,6 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (editor.value && editor.value.getHTML() !== newValue) {
-      console.log(newValue +"eeeeee")
       editor.value.commands.setContent(newValue || '');
     }
   }
