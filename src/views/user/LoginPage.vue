@@ -55,12 +55,25 @@ const onAnimationEnd = () => {
 };
 
 const handleLogin = () => {
+  const loadingSwal = Swal.fire({
+    title: '로그인 중...',
+    text: '로그인하고 있습니다. 잠시만 기다려주세요.',
+    icon: 'info',
+    allowOutsideClick: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading(); // 로딩 애니메이션 활성화
+    },
+  });
+
   login({
       email: email.value,
       password: password.value
     })
       .then(() => {
         isLoggedIn.value = true;
+        loadingSwal.close();
+
         Swal.fire({
           title: '로그인 완료',
           text: '로그인이 성공적으로 완료되었습니다.',
