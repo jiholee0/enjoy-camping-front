@@ -78,7 +78,7 @@
             class="join-button"
             :label="'회원가입'"
             :disabled="!isValidForm"
-            @click="handleSignup"
+            @click.stop="handleSignup"
           />
         </div>
       </form>
@@ -91,6 +91,7 @@ import { ref, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import Swal from 'sweetalert2';
+import { join } from '@/api/userApi';
 
 // 공유 상태 주입
 const isSignupModalOpen = inject('isSignupModalOpen');
@@ -169,26 +170,42 @@ const validateConfirmPassword = () => {
 };
 
 const handleSignup = () => {
+
   validateName();
   validateEmail();
   validatePassword();
   validateConfirmPassword();
 
   if (isValidForm.value) {
+    // 회원가입 API 호출
+    join({
+      name : name.value,
+      email : email.value,
+      password : password.value
+  })
+      .then(() => {
+        Swal.fire({
+          title: '회원가입 완료',
+          text: '회원가입이 성공적으로 완료되었습니다.',
+          icon: 'success',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push('/');
+          }
+        });
 
-    Swal.fire({
-      title: '회원가입 완료',
-      text: '회원가입이 성공적으로 완료되었습니다.',
-      icon: 'success',
-      confirmButtonText: '확인',
-      confirmButtonColor: '#0077b6',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        router.push('/');
-      }
-    });
-
-    startCloseModal();
+        startCloseModal();
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: 'ERROR!',
+          text: error.response.data.message,
+          icon: 'error',
+          confirmButtonText: '확인',
+        });
+      });
   } else {
     Swal.fire({
       title: 'ERROR!',
