@@ -19,16 +19,20 @@
         <li :class="{ active: isActive('/viewReviews') }">
           <router-link to="/viewReviews">리뷰 보기</router-link>
         </li>
-        <li :class="{ active: isActive('/writeReview') }">
+        <li v-if="isLoggedIn" :class="{ active: isActive('/writeReview') }">
           <router-link to="/writeReview">리뷰 쓰기</router-link>
         </li>
       </ul>
     </nav>
     <div class="auth-buttons">
-      <ButtonLight v-if="!isLoggedIn" label="로그인" @click.capture="login" />
-      <ButtonLight v-else label="로그아웃" @click.capture="logout" />
-      <ButtonDark v-if="!isLoggedIn" label="회원가입" @click.capture="signup" />
-      <ButtonDark v-else label="마이페이지" @click.capture="goToMyPage" />
+      <template v-if="isLoggedIn">
+        <ButtonLight label="로그아웃" @click.capture="logout" />
+        <ButtonDark label="마이페이지" @click.capture="goToMyPage" />
+      </template>
+      <template v-else>
+        <ButtonLight label="로그인" @click.capture="login" />
+        <ButtonDark label="회원가입" @click.capture="signup" />
+      </template>
     </div>
   </header>
 
@@ -37,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { inject } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoginModal from '@/views/user/LoginPage.vue';
 import SignupModal from '@/views/user/SignupPage.vue';
@@ -45,9 +49,9 @@ import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import Swal from 'sweetalert2';
 
-const isLoggedIn = ref(true);
-const isLoginModalOpen = ref(false);
-const isSignupModalOpen = ref(false);
+const isLoggedIn = inject('isLoggedIn');
+const isLoginModalOpen = inject('isLoginModalOpen');
+const isSignupModalOpen = inject('isSignupModalOpen');
 
 const router = useRouter();
 const route = useRoute();

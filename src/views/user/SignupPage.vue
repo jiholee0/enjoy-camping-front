@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showModal" class="modal-overlay" @click.self="startCloseModal">
+  <div v-if="isSignupModalOpen" class="modal-overlay" @click.self="startCloseModal">
     <div
       class="modal-container"
       :class="{ 'modal-out': isClosing }"
@@ -74,7 +74,12 @@
           </button>
         </div>
         <div class="form-actions">
-          <ButtonDark class="join-button" :label="'회원가입'" :disabled="!isValidForm" @submit.prevent="handleSignup" />
+          <ButtonDark
+            class="join-button"
+            :label="'회원가입'"
+            :disabled="!isValidForm"
+            @click="handleSignup"
+          />
         </div>
       </form>
     </div>
@@ -82,22 +87,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { defineProps, defineEmits } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import Swal from 'sweetalert2';
 
+// 공유 상태 주입
+const isSignupModalOpen = inject('isSignupModalOpen');
+
 const router = useRouter();
-
-defineProps({
-  showModal: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(['close']);
 
 const name = ref('');
 const email = ref('');
@@ -111,7 +109,7 @@ const isClosing = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// 모든 필드가 유효한지 확인하는 계산된 속성
+// 모든 필드 유효성 검사
 const isValidForm = computed(() => {
   return (
     name.value &&
@@ -132,7 +130,7 @@ const startCloseModal = () => {
 const onAnimationEnd = () => {
   if (isClosing.value) {
     isClosing.value = false;
-    emit('close');
+    isSignupModalOpen.value = false; // 모달 닫기
   }
 };
 
@@ -177,6 +175,7 @@ const handleSignup = () => {
   validateConfirmPassword();
 
   if (isValidForm.value) {
+
     Swal.fire({
       title: '회원가입 완료',
       text: '회원가입이 성공적으로 완료되었습니다.',
@@ -188,6 +187,8 @@ const handleSignup = () => {
         router.push('/');
       }
     });
+
+    startCloseModal();
   } else {
     Swal.fire({
       title: 'ERROR!',
@@ -196,13 +197,11 @@ const handleSignup = () => {
       confirmButtonText: '확인',
     });
   }
-  startCloseModal();
 };
-
-
 </script>
 
 <style scoped>
+/* 기존 스타일 유지 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -259,7 +258,7 @@ const handleSignup = () => {
 }
 
 .form-group {
-  position: relative; /* 부모 요소를 기준으로 버튼 위치 설정 */
+  position: relative;
   margin-bottom: 1em;
 }
 
@@ -271,7 +270,7 @@ const handleSignup = () => {
 .form-group input {
   width: 100%;
   padding: 0.5em;
-  padding-right: 2.5em; /* 버튼 공간 확보 */
+  padding-right: 2.5em;
   border: 1px solid #ccc;
   border-radius: 5px;
 }

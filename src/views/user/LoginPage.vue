@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showModal" class="modal-overlay" @click.self="startCloseModal">
+  <div v-if="isLoginModalOpen" class="modal-overlay" @click.self="startCloseModal">
     <div
       class="modal-container"
       :class="{ 'modal-out': isClosing }"
@@ -27,8 +27,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { defineProps, defineEmits } from 'vue';
+import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
@@ -36,17 +35,12 @@ import Swal from 'sweetalert2';
 
 const router = useRouter();
 
-defineProps({
-  showModal: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(['close']);
 const email = ref('');
 const password = ref('');
 const isClosing = ref(false);
+
+const isLoggedIn = inject('isLoggedIn');
+const isLoginModalOpen = inject('isLoginModalOpen');
 
 const startCloseModal = () => {
   isClosing.value = true;
@@ -55,12 +49,15 @@ const startCloseModal = () => {
 const onAnimationEnd = () => {
   if (isClosing.value) {
     isClosing.value = false;
-    emit('close');
+    isLoginModalOpen.value = false;
   }
 };
 
 const handleLogin = () => {
+  // 실제 로그인 로직을 수행하세요.
 
+  // 로그인 성공 시
+  isLoggedIn.value = true;
   Swal.fire({
     title: '로그인 완료',
     text: '로그인이 성공적으로 완료되었습니다.',
