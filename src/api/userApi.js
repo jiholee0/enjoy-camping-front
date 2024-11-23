@@ -8,11 +8,13 @@ export const join = ({
   });
 };
 
-// const login = (email, password) => {
-//   return apiClient.post(`/users/login`, {
-//     email, password
-//   });
-// };
+export const login = ({
+  email, password
+}) => {
+  return apiClient.post(`/users/login`, {
+    email, password
+  });
+};
 
 // const logout = () => {
 //   return apiClient.post(`/users/logout`);

@@ -16,11 +16,11 @@
           <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
         </div>
         <div class="form-actions">
-          <ButtonDark label="로그인" @click.capture="handleLogin" />
+          <ButtonDark label="로그인" @click.stop="handleLogin" />
         </div>
       </form>
       <div class="additional-actions">
-        <ButtonLight label="비밀번호 찾기" @click.capture="forgotPassword" />
+        <ButtonLight label="비밀번호 찾기" @click.stop="forgotPassword" />
       </div>
     </div>
   </div>
@@ -32,6 +32,7 @@ import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import Swal from 'sweetalert2';
+import { login } from '@/api/userApi';
 
 const router = useRouter();
 
@@ -54,23 +55,34 @@ const onAnimationEnd = () => {
 };
 
 const handleLogin = () => {
-  // 실제 로그인 로직을 수행하세요.
+  login({
+      email: email.value,
+      password: password.value
+    })
+      .then(() => {
+        isLoggedIn.value = true;
+        Swal.fire({
+          title: '로그인 완료',
+          text: '로그인이 성공적으로 완료되었습니다.',
+          icon: 'success',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push('/');
+          }
+        });
 
-  // 로그인 성공 시
-  isLoggedIn.value = true;
-  Swal.fire({
-    title: '로그인 완료',
-    text: '로그인이 성공적으로 완료되었습니다.',
-    icon: 'success',
-    confirmButtonText: '확인',
-    confirmButtonColor: '#0077b6',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.push('/');
-    }
-  });
-
-  startCloseModal();
+        startCloseModal();
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: 'ERROR!',
+          text: error.response.data.message,
+          icon: 'error',
+          confirmButtonText: '확인',
+        });
+      });
 };
 
 const forgotPassword = () => {
