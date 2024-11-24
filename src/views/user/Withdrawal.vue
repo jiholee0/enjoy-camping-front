@@ -69,7 +69,7 @@ const handleWithdrawl = () => {
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',
         }).then(() => {
-          router.push('');
+          router.push('/');
           window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
         });
 
