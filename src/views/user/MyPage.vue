@@ -7,26 +7,18 @@
 </template>
 
 <script setup>
-import { ref, markRaw } from 'vue';
+import { ref, markRaw, onMounted } from 'vue';
 import TabMenu from '@/components/tab/TabMenu.vue';
 import PasswordChange from '@/views/user/PasswordChange.vue';
 import ReviewList2 from '@/layout/list/ReviewCard2List.vue';
-import Withdraw from '@/views/user/Withdraw.vue';
+import Withdrawal from '@/views/user/Withdrawal.vue';
+import { getReviewByWriter } from '@/api/reviewApi';
+import { getMyDetail } from '@/api/userApi';
 
-const userName = ref("홍승찬");
-const userEmail = ref("hsch19@gmail.com");
+const userName = ref("");
+const userEmail = ref("");
 
-const reviewData = ref([
-  { id: 1, title: '제목1', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 2, title: '제목2', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 3, title: '제목3', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  { id: 4, title: '제목4', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 5, title: '제목5', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 6, title: '제목6', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-  { id: 7, title: '제목7', content: '훌륭한 캠핑장이었습니다!', date: '2024-11-05 17:22' },
-  { id: 8, title: '제목8', content: '깨끗하고 편안한 캠핑장이었어요.', date: '2024-11-05 17:22' },
-  { id: 9, title: '제목9', content: '괜찮지만 약간 시끄러웠어요.', date: '2024-11-05 17:22' },
-]);
+const reviewData = ref([]);
 
 const tabs = ref([
   { name: 'passwordChange', label: '비밀번호 수정', component: markRaw(PasswordChange) },
@@ -34,12 +26,37 @@ const tabs = ref([
     name: 'reviewList2',
     label: '작성한 리뷰 보기',
     component: markRaw(ReviewList2),
-    props: {
+    props: () => ({
       reviews: reviewData.value,
-    },
+    }),
    },
-  { name: 'withdraw', label: '회원 탈퇴하기', component: markRaw(Withdraw) },
+  { name: 'withdraw', label: '회원 탈퇴하기', component: markRaw(Withdrawal) },
 ]);
+
+const viewMyReviews = async () => {
+  try {
+    const response = await getReviewByWriter();
+    reviewData.value = response.data.result;
+    console.log(response.data)
+  } catch (error) {
+    console.error("리뷰 데이터를 불러오지 못했습니다:", error);
+  }
+};
+
+const viewMyDetail = async () => {
+  try {
+    const response = await getMyDetail();
+    userName.value = response.data.result.name;
+    userEmail.value = response.data.result.email;
+  } catch (error) {
+    console.error("리뷰 데이터를 불러오지 못했습니다:", error);
+  }
+}
+
+onMounted(async () => {
+  await viewMyReviews(); // 리뷰 데이터 로드
+  await viewMyDetail(); // 내 정보 로드
+});
 </script>
 
 <style scoped>

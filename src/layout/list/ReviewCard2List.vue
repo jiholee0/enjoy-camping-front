@@ -5,6 +5,7 @@
       <span>Page {{ currentPage }} of {{ totalPages }}</span>
       <ButtonLight class="button" @click.capture="nextPage" :disabled="currentPage === totalPages" label="다음" />
     </div>
+    <div v-if="reviews.length > 0" class="review-card-list">
     <ReviewCard2
       v-for="review in paginatedReviews"
       :key="review.id"
@@ -14,6 +15,8 @@
       :campsiteId="review.campingId"
       :reviewId="review.id"
     />
+    </div>
+    <p v-else class="no-results">작성한 리뷰가 없습니다.</p>
   </div>
 </template>
 
@@ -29,7 +32,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-
+console.log(props.reviews)
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 
@@ -61,6 +64,7 @@ const prevPage = () => {
 </script>
 
 <style scoped>
+.review-card-list,
 .review-list2 {
   gap: 16px;
   width: 700px;
@@ -85,5 +89,10 @@ const prevPage = () => {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+.no-results {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
 }
 </style>

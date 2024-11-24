@@ -23,3 +23,7 @@ export const logout = () => {
 export const withdrawal = () => {
   return apiClient.patch(`/users/delete`);
 };
+
+export const getMyDetail = () => {
+  return apiClient.get(`/users/detail`);
+};

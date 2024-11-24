@@ -37,8 +37,10 @@ const activeTabData = computed(() => props.tabs.find((tab) => tab.name === activ
 
 const activeComponent = computed(() => activeTabData.value?.component || null);
 
-const activeTabProps = computed(() => activeTabData.value?.props || {});
-
+const activeTabProps = computed(() => {
+  const tabProps = activeTabData.value?.props;
+  return typeof tabProps === 'function' ? tabProps() : tabProps || {};
+});
 const handlePageChange = (newPage) => {
   emit('change-page', newPage);
 };
