@@ -85,7 +85,7 @@ const handleWithdrawl = () => {
       } catch (error) {
         Swal.fire({
           title: '탈퇴 실패',
-          text: error.data.response.message,
+          text: error.response.data.message,
           icon: 'error',
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',

@@ -474,7 +474,7 @@ const saveEdit = async () => {
     // 오류 알림
     Swal.fire({
       title: '수정 실패',
-      text: '리뷰 수정 중 문제가 발생했습니다. 다시 시도해주세요.',
+      text: error.response.data.message,
       icon: 'error',
       confirmButtonText: '확인',
       confirmButtonColor: '#0077b6',
@@ -513,7 +513,7 @@ const deleteReviewAction = (index) => {
     cancelButtonColor: '#c1c1c1',
   }).then(async (result) => {
     if (result.isConfirmed) {
-      try {
+
         const loadingSwal = Swal.fire({
           title: '삭제 중...',
           text: '리뷰를 삭제하고 있습니다. 잠시만 기다려주세요.',
@@ -524,7 +524,7 @@ const deleteReviewAction = (index) => {
             Swal.showLoading(); // 로딩 애니메이션 활성화
           },
         });
-
+        try {
         await deleteReview(index); // 리뷰 삭제 API 호출
 
         await loadingSwal.close();
@@ -543,7 +543,7 @@ const deleteReviewAction = (index) => {
       } catch (error) {
         Swal.fire({
           title: '삭제 실패',
-          text: error.data.response.message,
+          text: error.response.data.message,
           icon: 'error',
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',
