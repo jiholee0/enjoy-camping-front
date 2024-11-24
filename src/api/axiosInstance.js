@@ -6,8 +6,8 @@ const apiClient = axios.create({
   baseURL: 'http://localhost', // 공통으로 사용할 baseURL
   headers: {
     'Content-Type': 'application/json',
-    withCredentials: true,
   },
+  withCredentials: true,
 });
 
 export default apiClient;

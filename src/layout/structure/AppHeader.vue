@@ -26,12 +26,12 @@
     </nav>
     <div class="auth-buttons">
       <template v-if="isLoggedIn">
-        <ButtonLight label="로그아웃" @click.capture="logout" />
+        <ButtonLight label="로그아웃" @click.stop="handleLogout" />
         <ButtonDark label="마이페이지" @click.capture="goToMyPage" />
       </template>
       <template v-else>
-        <ButtonLight label="로그인" @click.capture="login" />
-        <ButtonDark label="회원가입" @click.capture="signup" />
+        <ButtonLight label="로그인" @click.stop="login" />
+        <ButtonDark label="회원가입" @click.stop="signup" />
       </template>
     </div>
   </header>
@@ -48,6 +48,7 @@ import SignupModal from '@/views/user/SignupPage.vue';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import Swal from 'sweetalert2';
+import { logout } from '@/api/userApi';
 
 const isLoggedIn = inject('isLoggedIn');
 const isLoginModalOpen = inject('isLoginModalOpen');
@@ -64,18 +65,56 @@ const signup = () => {
   isSignupModalOpen.value = true;
 };
 
-const logout = () => {
-  isLoggedIn.value = false;
-
+const handleLogout = () => {
   Swal.fire({
-    title: '로그아웃 완료',
-    text: '로그아웃이 성공적으로 완료되었습니다.',
-    icon: 'success',
-    confirmButtonText: '확인',
-    confirmButtonColor: '#0077b6',
-  }).then((result) => {
+    title: '로그아웃하시겠습니까?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: '로그아웃',
+    cancelButtonText: '취소',
+    confirmButtonColor: '#b32020',
+    cancelButtonColor: '#c1c1c1',
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      router.push('/');
+      try {
+        const loadingSwal = Swal.fire({
+          title: '로그아웃 중...',
+          text: '로그아웃하고 있습니다. 잠시만 기다려주세요.',
+          icon: 'info',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading(); // 로딩 애니메이션 활성화
+          },
+        });
+
+        await logout();
+        isLoggedIn.value = false;
+
+        await loadingSwal.close();
+
+        Swal.fire({
+          title: '로그아웃 완료',
+          icon: 'success',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then(() => {
+          router.push('');
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+        });
+
+      } catch (error) {
+        Swal.fire({
+          title: '로그아웃 실패',
+          text: '로그아웃 중 문제가 발생했습니다. 다시 시도해주세요.',
+          icon: 'error',
+          confirmButtonText: '확인',
+          confirmButtonColor: '#0077b6',
+        }).then(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+        });
+        console.error('로그아웃 과정에서 오류가 발생했습니다:', error);
+      }
     }
   });
 };

@@ -16,10 +16,10 @@ export const login = ({
   });
 };
 
-// const logout = () => {
-//   return apiClient.post(`/users/logout`);
-// };
+export const logout = () => {
+  return apiClient.post(`/users/logout`);
+};
 
-// const withdrawal = () => {
-//   return apiClient.patch(`/users/delete`);
-// };
+export const withdrawal = () => {
+  return apiClient.patch(`/users/delete`);
+};
