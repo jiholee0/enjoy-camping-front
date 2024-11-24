@@ -27,6 +27,14 @@ import ButtonDark from "@/components/button/ButtonDark.vue";
 import Swal from "sweetalert2";
 import { withdrawal } from "@/api/userApi";
 import { useRouter } from "vue-router";
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+function deleteCookies() {
+    cookies.remove('accessToken', { path: '/' });
+    cookies.remove('refreshToken', { path: '/' });
+}
 
 const router = useRouter();
 
@@ -58,6 +66,7 @@ const handleWithdrawl = () => {
         });
 
         await withdrawal();
+        deleteCookies();
         isLoggedIn.value = false;
 
         await loadingSwal.close();

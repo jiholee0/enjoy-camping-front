@@ -49,6 +49,14 @@ import ButtonDark from '@/components/button/ButtonDark.vue';
 import ButtonLight from '@/components/button/ButtonLight.vue';
 import Swal from 'sweetalert2';
 import { logout } from '@/api/userApi';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+function deleteCookies() {
+    cookies.remove('accessToken', { path: '/' });
+    cookies.remove('refreshToken', { path: '/' });
+}
 
 const isLoggedIn = inject('isLoggedIn');
 const isLoginModalOpen = inject('isLoginModalOpen');
@@ -89,6 +97,7 @@ const handleLogout = () => {
         });
 
         await logout();
+        deleteCookies();
         isLoggedIn.value = false;
 
         await loadingSwal.close();
