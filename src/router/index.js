@@ -78,8 +78,9 @@ const router = createRouter({
 // 네비게이션 가드 추가
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
-    const accessToken = getCookie("accessToken");
-    if (!accessToken) {
+    const isAuthenticated = getCookie("isAuthenticated") === "true";
+    console.log(getCookie("isAuthenticated"))
+    if (!isAuthenticated) {
       // 경고 메시지 표시
       Swal.fire({
         icon: "warning",

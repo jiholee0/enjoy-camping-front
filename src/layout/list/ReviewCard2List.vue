@@ -32,7 +32,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-console.log(props.reviews)
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 
