@@ -4,12 +4,8 @@
       <div class="form-group">
         <label for="currentPassword">이전 비밀번호 입력</label>
         <div class="input-wrapper">
-          <input
-            :type="showCurrentPassword ? 'text' : 'password'"
-            id="currentPassword"
-            v-model="currentPassword"
-            required
-          />
+          <input :type="showCurrentPassword ? 'text' : 'password'" id="currentPassword" v-model="currentPassword"
+            required />
           <button type="button" class="eye-button" @click="toggleShowCurrentPassword">
             <img :src="showCurrentPassword ? '/images/eye.png' : '/images/closed-eye.png'" alt="Toggle visibility"
               class="eye-icon" />
@@ -19,11 +15,12 @@
 
       <div class="form-group">
         <div class="label">
-            <label for="newPassword">새 비밀번호</label>
-            <span v-if="passwordError" class="error-message">{{ passwordError }}</span>
-          </div>
+          <label for="newPassword">새 비밀번호</label>
+          <span v-if="passwordError" class="error-message">{{ passwordError }}</span>
+        </div>
         <div class="input-wrapper">
-          <input :type="showNewPassword ? 'text' : 'password'" id="newPassword" v-model="newPassword" @input="validatePassword" />
+          <input :type="showNewPassword ? 'text' : 'password'" id="newPassword" v-model="newPassword"
+            @input="validatePassword" />
           <button type="button" class="eye-button" @click="toggleShowNewPassword">
             <img :src="showNewPassword ? '/images/eye.png' : '/images/closed-eye.png'" alt="Toggle visibility"
               class="eye-icon" />
@@ -33,16 +30,12 @@
 
       <div class="form-group">
         <div class="label">
-            <label for="confirmPassword">비밀번호 확인 </label>
-            <span v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</span>
-          </div>
+          <label for="confirmPassword">비밀번호 확인 </label>
+          <span v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</span>
+        </div>
         <div class="input-wrapper">
-          <input
-            :type="showConfirmPassword ? 'text' : 'password'"
-            id="confirmPassword"
-            v-model="confirmPassword"
-            @input="validateConfirmPassword"
-          />
+          <input :type="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" v-model="confirmPassword"
+            @input="validateConfirmPassword" />
           <button type="button" class="eye-button" @click="toggleShowConfirmPassword">
             <img :src="showConfirmPassword ? '/images/eye.png' : '/images/closed-eye.png'" alt="Toggle visibility"
               class="eye-icon" />
@@ -60,6 +53,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import ButtonDark from '@/components/button/ButtonDark.vue';
 import Swal from 'sweetalert2';
+import { modifyPassword } from '@/api/userApi';
 
 const router = useRouter();
 
@@ -114,17 +108,62 @@ const handlePasswordChange = () => {
   validateConfirmPassword();
 
   if (isValidForm.value) {
+
     Swal.fire({
-      title: '비밀번호 변경 완료',
-      text: '비밀번호가 성공적으로 변경되었습니다.',
-      icon: 'success',
+      title: '비밀번호를 변경하시겠습니까?',
+      icon: 'warning',
+      showCancelButton: true,
       confirmButtonText: '확인',
-      confirmButtonColor: '#0077b6',
-    }).then((result) => {
+      cancelButtonText: '취소',
+      confirmButtonColor: '#b32020',
+      cancelButtonColor: '#c1c1c1',
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        router.push('/');
+        try {
+          const loadingSwal = Swal.fire({
+            title: '비밀번호 변경 중...',
+            text: '비밀번호를 변경하고 있습니다. 잠시만 기다려주세요.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+              Swal.showLoading(); // 로딩 애니메이션 활성화
+            },
+          });
+
+          await modifyPassword({
+            password: currentPassword.value,
+            newPassword: newPassword.value
+          });
+
+          await loadingSwal.close();
+
+          Swal.fire({
+            title: '비밀번호 변경 완료',
+            text: '비밀번호가 성공적으로 변경되었습니다.',
+            icon: 'success',
+            confirmButtonText: '확인',
+            confirmButtonColor: '#0077b6',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push('/myPage');
+            }
+          });
+        } catch (error) {
+          Swal.fire({
+            title: '비밀번호 변경 실패',
+            text: error.response.data.message,
+            icon: 'error',
+            confirmButtonText: '확인',
+            confirmButtonColor: '#0077b6',
+          }).then(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+          });
+          console.error('비밀번호 변경 과정에서 오류가 발생했습니다:', error);
+        }
       }
-    });
+    }
+    );
   } else {
     Swal.fire({
       title: '오류',
@@ -202,5 +241,4 @@ input {
   background-color: #81c3d7;
   cursor: not-allowed;
 }
-
 </style>

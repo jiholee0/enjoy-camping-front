@@ -27,3 +27,10 @@ export const withdrawal = () => {
 export const getMyDetail = () => {
   return apiClient.get(`/users/detail`);
 };
+
+export const modifyPassword = ({
+  password,
+  newPassword
+}) => {
+  return apiClient.patch(`/users/updatePwd`, {password, newPassword});
+};
