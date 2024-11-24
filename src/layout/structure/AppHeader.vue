@@ -106,7 +106,7 @@ const handleLogout = () => {
       } catch (error) {
         Swal.fire({
           title: '로그아웃 실패',
-          text: '로그아웃 중 문제가 발생했습니다. 다시 시도해주세요.',
+          text: error.data.response.message,
           icon: 'error',
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',

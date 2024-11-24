@@ -543,7 +543,7 @@ const deleteReviewAction = (index) => {
       } catch (error) {
         Swal.fire({
           title: '삭제 실패',
-          text: '리뷰 삭제 중 문제가 발생했습니다. 다시 시도해주세요.',
+          text: error.data.response.message,
           icon: 'error',
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',

@@ -22,12 +22,16 @@
 </template>
 
 <script setup>
+import { inject } from 'vue';
 import ButtonDark from "@/components/button/ButtonDark.vue";
 import Swal from "sweetalert2";
 import { withdrawal } from "@/api/userApi";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+
+const isLoggedIn = inject('isLoggedIn');
+
 const handleWithdrawl = () => {
 
     Swal.fire({
@@ -54,6 +58,7 @@ const handleWithdrawl = () => {
         });
 
         await withdrawal();
+        isLoggedIn.value = false;
 
         await loadingSwal.close();
 
@@ -64,14 +69,14 @@ const handleWithdrawl = () => {
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',
         }).then(() => {
-          router.push('/');
+          router.push('');
           window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
         });
 
       } catch (error) {
         Swal.fire({
           title: '탈퇴 실패',
-          text: '탈퇴 중 문제가 발생했습니다. 다시 시도해주세요.',
+          text: error.data.response.message,
           icon: 'error',
           confirmButtonText: '확인',
           confirmButtonColor: '#0077b6',
