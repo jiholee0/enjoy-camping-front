@@ -1,5 +1,5 @@
 <script setup>
-import { provide, ref } from "vue";
+import { provide, ref, onMounted } from "vue";
 import Header from "@/layout/structure/AppHeader.vue";
 import Footer from "@/layout/structure/AppFooter.vue";
 import ScrollContainer from "./components/scroll/ScrollContainer.vue";
@@ -7,10 +7,37 @@ import ScrollContainer from "./components/scroll/ScrollContainer.vue";
 const isLoggedIn = ref(false); // 초기 로그인 상태
 const isLoginModalOpen = ref(false);
 const isSignupModalOpen = ref(false);
+const userId = ref(0);
+
+// 쿠키에서 userId를 가져오는 함수
+const getCookie = (name) => {
+  const cookieString = document.cookie;
+  const cookies = cookieString.split("; ");
+  for (let cookie of cookies) {
+    const [key, value] = cookie.split("=");
+    if (key === name) {
+      return value;
+    }
+  }
+  return null;
+};
+
+// 컴포넌트가 마운트될 때 쿠키를 확인하여 로그인 상태 설정
+onMounted(() => {
+  const userIdFromCookie = getCookie("userId");
+  if (userIdFromCookie) {
+    userId.value = parseInt(userIdFromCookie);
+    isLoggedIn.value = true;
+  } else {
+    userId.value = 0;
+    isLoggedIn.value = false;
+  }
+});
 
 provide('isLoggedIn', isLoggedIn);
 provide('isLoginModalOpen', isLoginModalOpen);
 provide('isSignupModalOpen', isSignupModalOpen);
+provide('userId', userId);
 
 </script>
 

@@ -131,7 +131,7 @@
             <p>{{ formatDate(selectedReview.createdAt) }}</p>
             <div class="review-content" v-html="selectedReview.content"></div>
             <!-- 우측 하단 버튼 -->
-            <div class="review-actions">
+            <div v-if="canEdit" class="review-actions">
               <ButtonLight
                 class="edit-button"
                 @click.capture="startEditing"
@@ -176,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, inject } from 'vue';
 import { useRouter } from 'vue-router';
 import { getCampsites, getCampsiteDetail } from '@/api/campsiteApi.js';
 import { getReviewByCampsite, updateReview, deleteReview, uploadImageToS3, createPresignedUrl } from '@/api/reviewApi.js'
@@ -209,6 +209,9 @@ const itemsPerPage = 9;
 const totalItems = ref(0);
 
 const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+
+const userId = inject('userId');
+const canEdit = ref(false);
 
 const router = useRouter();
 
@@ -313,6 +316,9 @@ const selectReview = (review) => {
   isEditing.value = false;
   editedReviewTitle.value = review.title;
   editedReviewContent.value = review.content;
+  canEdit.value = userId.value === review.writerId;
+
+  console.log("writerId" + userId.value === review.writerId)
 
   // 검색 섹션 숨김 처리
   setTimeout(() => {
@@ -321,6 +327,7 @@ const selectReview = (review) => {
   }
   }, 300); // 리뷰 슬라이드 애니메이션이 끝난 후 검색 섹션 숨김
 };
+
 
 const navigateToDetail = (campingId) => {
   router.push(`/detail/campings/${campingId}`);
@@ -572,6 +579,9 @@ const prevPage = () => {
 
 onMounted(async () => {
   const { campsiteId, reviewId } = router.currentRoute.value.query;
+
+  console.log("userId" + userId.value);
+  console.log("writerId" + selectedReview.value)
 
   if (campsiteId) {
     try {
