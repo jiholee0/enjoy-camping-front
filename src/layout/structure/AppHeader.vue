@@ -31,7 +31,7 @@
       </template>
       <template v-else>
         <ButtonLight label="로그인" @click.stop="login" />
-        <ButtonDark label="회원가입" @click.stop="signup" />
+        <ButtonDark label="회원가입" @click.capture="signup" />
       </template>
     </div>
   </header>

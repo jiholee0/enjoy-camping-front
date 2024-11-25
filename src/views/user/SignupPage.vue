@@ -78,7 +78,7 @@
             class="join-button"
             :label="'회원가입'"
             :disabled="!isValidForm"
-            @click.stop="handleSignup"
+            @buttonClick.stop="handleSignup"
           />
         </div>
       </form>
@@ -170,7 +170,6 @@ const validateConfirmPassword = () => {
 };
 
 const handleSignup = () => {
-
   validateName();
   validateEmail();
   validatePassword();

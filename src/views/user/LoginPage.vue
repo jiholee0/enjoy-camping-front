@@ -16,11 +16,11 @@
           <input type="password" id="password" v-model="password" placeholder="비밀번호 입력" required />
         </div>
         <div class="form-actions">
-          <ButtonDark label="로그인" @click.stop="handleLogin" />
+          <ButtonDark label="로그인" @buttonClick.stop="handleLogin" />
         </div>
       </form>
       <div class="additional-actions">
-        <ButtonLight label="비밀번호 찾기" @click.stop="forgotPassword" />
+        <ButtonLight label="비밀번호 찾기" @buttonClick.stop="forgotPassword" />
       </div>
     </div>
   </div>

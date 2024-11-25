@@ -1,6 +1,6 @@
 <!-- ButtonDark.vue -->
 <template>
-  <button class="button-dark" @click="$emit('click1')">
+  <button class="button-dark" @click="$emit('buttonClick')">
     <slot>{{ label }}</slot>
   </button>
 </template>
