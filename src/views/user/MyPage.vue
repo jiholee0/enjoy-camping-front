@@ -37,7 +37,6 @@ const viewMyReviews = async () => {
   try {
     const response = await getReviewByWriter();
     reviewData.value = response.data.result;
-    console.log(response.data)
   } catch (error) {
     console.error("리뷰 데이터를 불러오지 못했습니다:", error);
   }

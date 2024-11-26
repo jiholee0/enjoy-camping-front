@@ -318,8 +318,6 @@ const selectReview = (review) => {
   editedReviewContent.value = review.content;
   canEdit.value = userId.value === review.writerId;
 
-  console.log("writerId" + userId.value === review.writerId)
-
   // 검색 섹션 숨김 처리
   setTimeout(() => {
   if (searchSectionRef.value) {
@@ -580,8 +578,6 @@ const prevPage = () => {
 onMounted(async () => {
   const { campsiteId, reviewId } = router.currentRoute.value.query;
 
-  console.log("userId" + userId.value);
-  console.log("writerId" + selectedReview.value)
 
   if (campsiteId) {
     try {
@@ -597,6 +593,8 @@ onMounted(async () => {
         selectedReview.value = reviews.value.find(
           (review) => review.id === parseInt(reviewId)
         );
+        canEdit.value = userId.value === selectedReview.value.writerId;
+        console.log(canEdit.value)
       }
     } catch (error) {
       console.error("캠핑장 정보를 불러오는 중 오류가 발생했습니다:", error);
